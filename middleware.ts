@@ -1,6 +1,10 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/auth|auth|api/health).*)"],
+};
+
 export default withAuth(
   function middleware(req) {
     return NextResponse.next();
@@ -9,15 +13,11 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         const path = req.nextUrl.pathname;
-        // Allow auth pages without token
         if (path.startsWith("/auth")) return true;
-        // Require token for all other pages
+        if (path.startsWith("/api/auth")) return true;
+        if (path === "/api/health") return true;
         return !!token;
       },
     },
   }
 );
-
-export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
-};
