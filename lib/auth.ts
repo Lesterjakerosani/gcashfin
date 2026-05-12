@@ -3,12 +3,34 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "./prisma";
 import bcrypt from "bcryptjs";
 
-const nextAuthSecret = process.env.NEXTAUTH_SECRET || process.env.SECRET || "dev-secret";
+// Get or generate secret - required for NextAuth
+const getSecret = () => {
+  const secret = process.env.NEXTAUTH_SECRET;
+  if (secret) return secret;
+  
+  // In development, generate a temporary secret
+  if (process.env.NODE_ENV === "development") {
+    console.warn(
+      "⚠️  NEXTAUTH_SECRET not set. Using temporary dev secret. " +
+      "Set NEXTAUTH_SECRET in .env for production."
+    );
+    return "temporary-dev-secret-change-this-in-production";
+  }
+  
+  // In production, use a fallback (Vercel should have set this)
+  console.error(
+    "ERROR: NEXTAUTH_SECRET environment variable is not set. " +
+    "Add it in Vercel Settings → Environment Variables."
+  );
+  return "missing-secret-in-production";
+};
+
+const secret = getSecret();
 const nextAuthUrl =
   process.env.NEXTAUTH_URL ||
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
 
-if (!process.env.NEXTAUTH_URL) {
+if (!process.env.NEXTAUTH_URL && process.env.VERCEL_URL) {
   process.env.NEXTAUTH_URL = nextAuthUrl;
 }
 
@@ -45,5 +67,5 @@ export const authOptions: NextAuthOptions = {
   },
   pages: { signIn: "/auth/login" },
   session: { strategy: "jwt" },
-  secret: nextAuthSecret,
+  secret,
 };
