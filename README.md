@@ -76,8 +76,19 @@ Open [http://localhost:3000](http://localhost:3000)
 ```bash
 npm install -g vercel
 vercel
-# Set environment variables in Vercel dashboard
 ```
+
+**In Vercel Dashboard:**
+1. Go to your project settings
+2. Add these environment variables:
+   - `DATABASE_URL` = your Neon PostgreSQL connection string
+   - `NEXTAUTH_SECRET` = run `openssl rand -base64 32` locally
+   - `NEXTAUTH_URL` = your Vercel deployment URL (e.g., `https://your-app.vercel.app`)
+
+**Important Notes:**
+- Make sure your Neon database allows connections from `0.0.0.0/0` (all IPs)
+- The app will automatically run `prisma generate` during build
+- Use `/api/health` to check if deployment is working
 
 **Railway / Render / Fly.io:**
 ```bash
