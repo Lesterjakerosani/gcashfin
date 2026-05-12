@@ -23,10 +23,19 @@ export default function RegisterPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, password }),
     });
-    const data = await res.json();
+    let data: any = null;
+    try {
+      data = await res.json();
+    } catch {
+      data = null;
+    }
     setLoading(false);
-    if (!res.ok) { setError(data.error || "Registration failed."); }
-    else { toast.success("Account created! Please sign in."); router.push("/auth/login"); }
+    if (!res.ok) {
+      setError(data?.error || data?.message || "Registration failed.");
+    } else {
+      toast.success("Account created! Please sign in.");
+      router.push("/auth/login");
+    }
   }
 
   return (
