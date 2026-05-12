@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String        @id @default(cuid())
+  name          String
+  email         String        @unique
+  password      String
+  role          String        @default("admin")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  accounts      Account[]
+  transactions  Transaction[]
+  salaryEntries SalaryEntry[]
+  settings      Setting[]
+}
+
+model Account {
+  id           String        @id @default(cuid())
+  userId       String
+  model        String
+  phone        String
+  balance      Float         @default(0)
+  used         Float         @default(0)
+  limit        Float         @default(100000)
+  category     String        @default("Personal")
+  color        String        @default("#c0392b")
+  notes        String?
+  archived     Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+}
+
+model Transaction {
+  id        String   @id @default(cuid())
+  userId    String
+  accountId String
+  type      String
+  amount    Float
+  balAfter  Float    @default(0)
+  phone     String
+  account   String
+  category  String
+  notes     String?
+  status    String   @default("Completed")
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  acct      Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+}
+
+model SalaryEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  date      String
+  type      String   @default("profit")
+  amount    Float
+  category  String   @default("Profit")
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  userId    String
+  key       String
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, key])
+}
