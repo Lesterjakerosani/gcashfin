@@ -37,14 +37,16 @@ export async function POST(req: NextRequest) {
   const userId = (session.user as any).id;
   try {
     const { accountId, type, amount, notes } = await req.json();
-    if (!accountId || !type || !amount) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    const amountNum = Number(amount || 0);
+    if (!accountId || !type) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    if (type !== "Reset" && (!amountNum || amountNum <= 0)) return NextResponse.json({ error: "Enter a valid transaction amount" }, { status: 400 });
 
     const account = await prisma.account.findFirst({ where: { id: accountId, userId } });
     if (!account) return NextResponse.json({ error: "Account not found" }, { status: 404 });
 
     let newUsed = account.used;
-    if (type === "Add") newUsed += amount;
-    else if (type === "Deduct") newUsed = Math.max(0, newUsed - amount);
+    if (type === "Add") newUsed = Math.min(account.limit, newUsed + amountNum);
+    else if (type === "Deduct") newUsed = Math.max(0, newUsed - amountNum);
     else if (type === "Reset") newUsed = 0;
 
     const availableAfter = Math.max(0, account.limit - newUsed);
@@ -52,7 +54,7 @@ export async function POST(req: NextRequest) {
     const [tx] = await prisma.$transaction([
       prisma.transaction.create({
         data: {
-          userId, accountId, type, amount: type === "Reset" ? 0 : amount,
+          userId, accountId, type, amount: type === "Reset" ? 0 : amountNum,
           balAfter: availableAfter, phone: account.phone, account: account.model,
           category: account.category, notes, status: "Completed",
         },
