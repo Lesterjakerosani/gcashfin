@@ -48,6 +48,14 @@ export interface SalaryEntry {
   createdAt: Date;
 }
 
+export interface Note {
+  id: string;
+  userId: string;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface DashboardStats {
   totalAccounts: number;
   totalBalance: number;

@@ -102,7 +102,7 @@ export default function SettingsPage() {
                 <div>
                   <div className="text-white font-semibold">{session?.user?.name}</div>
                   <div className="text-[#888] text-sm">{session?.user?.email}</div>
-                  <div className="bg-[rgba(192,57,43,0.15)] text-[#e74c3c] text-[10px] px-2 py-0.5 rounded-full border border-red-700/30 mt-1 inline-block uppercase tracking-widest">{(session?.user as any)?.role || "admin"}</div>
+                  <div className="bg-[rgba(192,57,43,0.15)] text-[#e74c3c] text-[10px] px-2 py-0.5 rounded-full border border-red-700/30 mt-1 inline-block uppercase tracking-widest">{session?.user?.role || "admin"}</div>
                 </div>
               </div>
               <div>
