@@ -3,11 +3,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { LayoutDashboard, DollarSign, BarChart3, PieChart, Settings, LogOut, Menu, X } from "lucide-react";
+import { LayoutDashboard, DollarSign, BarChart3, PieChart, Settings, LogOut, Menu, X, FileText } from "lucide-react";
 
 const links = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/salary", label: "Salary", icon: DollarSign },
+  { href: "/notes", label: "Notes", icon: FileText },
   { href: "/reports", label: "Reports", icon: BarChart3 },
   { href: "/analytics", label: "Analytics", icon: PieChart },
   { href: "/settings", label: "Settings", icon: Settings },
