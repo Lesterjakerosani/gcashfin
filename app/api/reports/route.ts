@@ -26,14 +26,22 @@ export async function GET(req: NextRequest) {
     const todayEntries = salary.filter((e: any) => e.date === todayStr);
     const todayProfit = todayEntries.reduce((s: number, e: any) => s + entryNet(e), 0);
     const todayTx = transactions.filter((t: any) => t.createdAt.toISOString().slice(0,10) === todayStr).length;
-    const last7: { label: string; v: number }[] = [];
-    for (let i = 29; i >= 0; i--) {
-      const d = new Date(now); d.setDate(d.getDate() - i);
-      const ds = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-      const v = salary.filter((e: any) => e.date === ds).reduce((s: number, e: any) => s + entryNet(e), 0);
-      last7.push({ label: MSHORT[d.getMonth()] + " " + d.getDate(), v: Math.max(0, v) });
+    
+    // Build daily profits for entire year
+    const dailyProfits: { [key: string]: number } = {};
+    const currentYear = now.getFullYear();
+    
+    // Iterate through all days of the year
+    for (let month = 0; month < 12; month++) {
+      const daysInMonth = new Date(currentYear, month + 1, 0).getDate();
+      for (let day = 1; day <= daysInMonth; day++) {
+        const ds = `${currentYear}-${pad(month+1)}-${pad(day)}`;
+        const v = salary.filter((e: any) => e.date === ds).reduce((s: number, e: any) => s + entryNet(e), 0);
+        dailyProfits[ds] = Math.max(0, v);
+      }
     }
-    return NextResponse.json({ todayProfit, todayTx, activeAccounts: accounts.filter((a: any) => !a.archived).length, last7 });
+    
+    return NextResponse.json({ todayProfit, todayTx, activeAccounts: accounts.filter((a: any) => !a.archived).length, dailyProfits });
   }
 
   if (type === "monthly") {
