@@ -9,7 +9,11 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   const userId = (session.user as any).id;
   const account = await prisma.account.findFirst({ where: { id: params.id, userId } });
   if (!account) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  return NextResponse.json(account);
+  return NextResponse.json({
+    ...account,
+    available: Math.max(0, account.limit - account.used),
+    usagePct: account.limit ? parseFloat(((account.used / account.limit) * 100).toFixed(1)) : 0,
+  });
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {

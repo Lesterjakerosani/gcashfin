@@ -8,6 +8,7 @@ import { fmt, ACCOUNT_COLORS, MONTHS } from "@/lib/utils";
 type Account = {
   id: string; model: string; phone: string; balance: number; used: number;
   limit: number; category: string; color: string; notes?: string; archived: boolean;
+  available?: number; usagePct?: number;
 };
 type Tx = { id: string; type: string; amount: number; balAfter: number; phone: string; account: string; category: string; notes?: string; status: string; createdAt: string; };
 
@@ -60,28 +61,45 @@ export default function DashboardPage() {
     mutationFn: async (data: any) => {
       const url = editId ? `/api/accounts/${editId}` : "/api/accounts";
       const res = await fetch(url, { method: editId ? "PUT" : "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(data) });
-      if (!res.ok) throw new Error((await res.json()).error);
-      return res.json();
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || "Failed to save account.");
+      return body;
     },
     onSuccess: () => { qc.invalidateQueries(); setShowModal(false); toast.success(editId ? "Account updated!" : "Account added!"); },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: any) => toast.error(e?.message || "Failed to save account."),
   });
 
   const delMut = useMutation({
-    mutationFn: (id: string) => fetch(`/api/accounts/${id}`, { method: "DELETE" }).then(r=>r.json()),
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/accounts/${id}`, { method: "DELETE" });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || "Failed to delete account.");
+      return body;
+    },
     onSuccess: () => { qc.invalidateQueries(); toast.success("Account deleted."); },
+    onError: (error: any) => toast.error(error?.message || "Failed to delete account."),
   });
 
   const archMut = useMutation({
-    mutationFn: ({ id, archived }: { id: string; archived: boolean }) =>
-      fetch(`/api/accounts/${id}`, { method: "PUT", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ archived }) }).then(r=>r.json()),
+    mutationFn: async ({ id, archived }: { id: string; archived: boolean }) => {
+      const res = await fetch(`/api/accounts/${id}`, { method: "PUT", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ archived }) });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || "Failed to update account.");
+      return body;
+    },
     onSuccess: () => { qc.invalidateQueries(); toast.success("Updated."); },
+    onError: (error: any) => toast.error(error?.message || "Failed to update account."),
   });
 
   const txMut = useMutation({
-    mutationFn: (data: any) => fetch("/api/transactions", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(data) }).then(r=>r.json()),
+    mutationFn: async (data: any) => {
+      const res = await fetch("/api/transactions", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(data) });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || "Transaction failed.");
+      return body;
+    },
     onSuccess: () => { qc.invalidateQueries(); toast.success("Transaction completed!"); },
-    onError: () => toast.error("Transaction failed."),
+    onError: (error: any) => toast.error(error?.message || "Transaction failed."),
   });
 
   function openAdd() { setEditId(null); setForm({model:"",phone:"",balance:"",limit:"100000",category:"Personal",color:"#c0392b",notes:""}); setSelectedColor("#c0392b"); setShowModal(true); }
@@ -158,8 +176,8 @@ export default function DashboardPage() {
               {accounts.length === 0 ? (
                 <tr><td colSpan={12} className="text-center py-12 text-[#555]"><div className="text-4xl mb-3 opacity-40">📱</div><div className="text-xs">No accounts yet. Add your first GCash account.</div></td></tr>
               ) : accounts.map((a, i) => {
-                const avail = Math.max(0, a.limit - a.used);
-                const pct = a.limit ? (a.used / a.limit) * 100 : 0;
+                const avail = a.available ?? Math.max(0, a.limit - a.used);
+                const pct = a.usagePct ?? (a.limit ? (a.used / a.limit) * 100 : 0);
                 const st = getStatus(a);
                 return (
                   <tr key={a.id} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">

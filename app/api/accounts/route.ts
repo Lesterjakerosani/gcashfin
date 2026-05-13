@@ -37,7 +37,12 @@ export async function GET(req: NextRequest) {
     where: whereBase,
     orderBy: { createdAt: "desc" },
   });
-  return NextResponse.json(accounts);
+  const mapped = accounts.map((a) => ({
+    ...a,
+    available: Math.max(0, a.limit - a.used),
+    usagePct: a.limit ? parseFloat(((a.used / a.limit) * 100).toFixed(1)) : 0,
+  }));
+  return NextResponse.json(mapped);
 }
 
 export async function POST(req: NextRequest) {
