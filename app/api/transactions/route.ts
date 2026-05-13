@@ -47,13 +47,13 @@ export async function POST(req: NextRequest) {
     else if (type === "Deduct") newUsed = Math.max(0, newUsed - amount);
     else if (type === "Reset") newUsed = 0;
 
-    const balAfter = account.balance - newUsed;
+    const availableAfter = Math.max(0, account.limit - newUsed);
 
     const [tx] = await prisma.$transaction([
       prisma.transaction.create({
         data: {
           userId, accountId, type, amount: type === "Reset" ? 0 : amount,
-          balAfter, phone: account.phone, account: account.model,
+          balAfter: availableAfter, phone: account.phone, account: account.model,
           category: account.category, notes, status: "Completed",
         },
       }),

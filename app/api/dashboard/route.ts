@@ -22,6 +22,7 @@ export async function GET(req: NextRequest) {
   const active = accounts.filter((a) => !a.archived);
   const totalBalance = active.reduce((s, a) => s + a.balance, 0);
   const totalUsed = active.reduce((s, a) => s + a.used, 0);
+  const totalAvailable = active.reduce((s, a) => s + Math.max(0, a.limit - a.used), 0);
   const entryNet = (e: any) => e.type === "expense" ? -e.amount : e.amount;
 
   const monthlyProfit = salary.filter((e) => e.date.startsWith(monthPrefix)).reduce((s, e) => s + entryNet(e), 0);
@@ -34,7 +35,7 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({
     totalAccounts: active.length, totalBalance, totalUsed,
-    totalAvailable: Math.max(0, totalBalance - totalUsed),
+    totalAvailable: totalAvailable,
     monthlyProfit, dailyProfit, highestDay, highestDate,
     totalTransactions: transactions.length,
     monthLabel: MONTHS[now.getMonth()] + " " + now.getFullYear(),

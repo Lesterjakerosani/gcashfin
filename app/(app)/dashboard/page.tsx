@@ -158,7 +158,7 @@ export default function DashboardPage() {
               {accounts.length === 0 ? (
                 <tr><td colSpan={12} className="text-center py-12 text-[#555]"><div className="text-4xl mb-3 opacity-40">📱</div><div className="text-xs">No accounts yet. Add your first GCash account.</div></td></tr>
               ) : accounts.map((a, i) => {
-                const avail = Math.max(0, a.balance - a.used);
+                const avail = Math.max(0, a.limit - a.used);
                 const pct = a.limit ? (a.used / a.limit) * 100 : 0;
                 const st = getStatus(a);
                 return (

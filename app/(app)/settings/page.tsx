@@ -22,18 +22,46 @@ export default function SettingsPage() {
 
   const saveMut = useMutation({
     mutationFn: async (key: string) => {
-      await fetch("/api/settings", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ key, value: name }) });
+      const res = await fetch("/api/settings", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ key, value: name }) });
+      if (!res.ok) throw new Error((await res.json()).error || "Failed to save settings");
     },
     onSuccess: () => toast.success("Settings saved."),
+    onError: (error: any) => toast.error(error?.message || "Unable to save settings."),
+  });
+
+  const pwMut = useMutation({
+    mutationFn: async (data: { currentPassword: string; newPassword: string; confirmPassword: string }) => {
+      const res = await fetch("/api/auth/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || "Unable to update password.");
+      return body;
+    },
+    onSuccess: () => {
+      toast.success("Password updated successfully!");
+      setOldPw(""); setNewPw(""); setConfPw("");
+    },
+    onError: (error: any) => toast.error(error?.message || "Password update failed."),
   });
 
   function handleChangePw(e: React.FormEvent) {
     e.preventDefault();
-    if (newPw !== confPw) { toast.error("Passwords do not match."); return; }
-    if (newPw.length < 6) { toast.error("Password must be at least 6 characters."); return; }
-    // In production: call API to change password
-    toast.success("Password updated successfully!");
-    setOldPw(""); setNewPw(""); setConfPw("");
+    if (!oldPw || !newPw || !confPw) {
+      toast.error("Please fill all password fields.");
+      return;
+    }
+    if (newPw !== confPw) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+    if (newPw.length < 6) {
+      toast.error("Password must be at least 6 characters.");
+      return;
+    }
+    pwMut.mutate({ currentPassword: oldPw, newPassword: newPw, confirmPassword: confPw });
   }
 
   function exportData() {
@@ -97,7 +125,7 @@ export default function SettingsPage() {
                       <input type="password" value={f.value} onChange={e=>f.set(e.target.value)} required className="w-full bg-white/[0.04] border border-white/[0.07] rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-red-700" />
                     </div>
                   ))}
-                  <button type="submit" className="flex items-center gap-1.5 bg-[#c0392b] hover:bg-[#e74c3c] text-white px-4 py-2 rounded text-sm transition-all mt-1"><Save size={12} /> Update Password</button>
+                  <button type="submit" disabled={pwMut.isLoading} className="flex items-center gap-1.5 bg-[#c0392b] hover:bg-[#e74c3c] disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded text-sm transition-all mt-1"><Save size={12} /> {pwMut.isLoading ? "Updating..." : "Update Password"}</button>
                 </form>
               </div>
             </div>
