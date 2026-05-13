@@ -125,7 +125,14 @@ export default function SettingsPage() {
                       <input type="password" value={f.value} onChange={e=>f.set(e.target.value)} required className="w-full bg-white/[0.04] border border-white/[0.07] rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-red-700" />
                     </div>
                   ))}
-                  <button type="submit" disabled={pwMut.isLoading} className="flex items-center gap-1.5 bg-[#c0392b] hover:bg-[#e74c3c] disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded text-sm transition-all mt-1"><Save size={12} /> {pwMut.isLoading ? "Updating..." : "Update Password"}</button>
+                  <button
+                    type="submit"
+                    disabled={pwMut.isPending}
+                    className="flex items-center gap-1.5 bg-[#c0392b] hover:bg-[#e74c3c] disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded text-sm transition-all mt-1"
+                  >
+                    <Save size={12} />
+                    {pwMut.isPending ? "Updating..." : "Update Password"}
+                  </button>
                 </form>
               </div>
             </div>
