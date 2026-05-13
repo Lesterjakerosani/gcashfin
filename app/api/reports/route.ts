@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
     const todayProfit = todayEntries.reduce((s: number, e: any) => s + entryNet(e), 0);
     const todayTx = transactions.filter((t: any) => t.createdAt.toISOString().slice(0,10) === todayStr).length;
     const last7: { label: string; v: number }[] = [];
-    for (let i = 6; i >= 0; i--) {
+    for (let i = 29; i >= 0; i--) {
       const d = new Date(now); d.setDate(d.getDate() - i);
       const ds = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
       const v = salary.filter((e: any) => e.date === ds).reduce((s: number, e: any) => s + entryNet(e), 0);

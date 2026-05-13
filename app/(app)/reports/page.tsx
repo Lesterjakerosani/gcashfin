@@ -90,7 +90,7 @@ export default function ReportsPage() {
             ))}
           </div>
           <div className="bg-[rgba(15,15,15,0.92)] border border-white/[0.07] rounded-lg p-5">
-            <div className="text-[11px] uppercase tracking-widest text-[#888] mb-4">Last 7 Days — Profit</div>
+            <div className="text-[11px] uppercase tracking-widest text-[#888] mb-4">Last 30 Days — Profit</div>
             <BarChart data={data.last7 || []} />
           </div>
         </div>
