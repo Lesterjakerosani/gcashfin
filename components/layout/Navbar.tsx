@@ -14,7 +14,7 @@ const links = [
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
-export function Navbar({ user }: { user: { name?: string; email?: string; role?: string } }) {
+export function Navbar({ user }: { user: { name?: string | null; email?: string | null; role?: string } }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
