@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { Plus, Trash2, Download } from "lucide-react";
@@ -12,13 +12,29 @@ const EXPENSE_CATS = ["Withdrawal","Load Cost","Fees","General","Other"];
 
 function entryNet(e: Entry) { return e.type === "expense" ? -e.amount : e.amount; }
 
+function getPHDate() {
+  return new Intl.DateTimeFormat('en-PH', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()).split('/').reverse().join('-');
+}
+
 export default function SalaryPage() {
   const qc = useQueryClient();
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth());
   const [year, setYear] = useState(now.getFullYear());
-  const [form, setForm] = useState({ date: new Date().toISOString().slice(0,10), type: "profit", amount: "", category: "Profit", notes: "" });
+  const [currentPHDate, setCurrentPHDate] = useState(getPHDate());
+  const [form, setForm] = useState({ date: currentPHDate, type: "profit", amount: "", category: "Profit", notes: "" });
   const [editNotes, setEditNotes] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newDate = getPHDate();
+      if (newDate !== currentPHDate) {
+        setCurrentPHDate(newDate);
+        setForm(f => ({...f, date: newDate}));
+      }
+    }, 60000); // check every minute
+    return () => clearInterval(interval);
+  }, [currentPHDate]);
 
   const { data: entries = [] } = useQuery<Entry[]>({
     queryKey: ["salary", month, year],
@@ -201,7 +217,7 @@ export default function SalaryPage() {
                 const profit = dayEntries.filter(e=>e.type==="profit").reduce((s,e)=>s+e.amount,0);
                 const expense = dayEntries.filter(e=>e.type==="expense").reduce((s,e)=>s+e.amount,0);
                 const net = profit - expense;
-                const isToday = ds === new Date().toISOString().slice(0,10);
+                const isToday = ds === currentPHDate;
                 return (
                   <tr key={ds} className={`border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors ${isToday ? "bg-white/[0.03]" : ""}`}>
                     <td className="px-4 py-2 font-display text-lg text-[#555]">{String(day).padStart(2,"0")}</td>
