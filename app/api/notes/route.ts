@@ -3,12 +3,19 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    console.log("[Notes API] GET - Starting request");
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
-      console.warn("[Notes API] GET - Unauthorized: No user session");
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    
+    if (!session) {
+      console.warn("[Notes API] GET - No session found");
+      return NextResponse.json({ error: "Unauthorized", details: "No session" }, { status: 401 });
+    }
+
+    if (!session.user?.id) {
+      console.warn("[Notes API] GET - No user ID in session");
+      return NextResponse.json({ error: "Unauthorized", details: "No user ID" }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -24,8 +31,10 @@ export async function GET() {
     });
   } catch (error) {
     console.error("[Notes API] GET - Error:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("[Notes API] GET - Error details:", errorMessage);
     return NextResponse.json(
-      { error: "Failed to fetch notes", details: error instanceof Error ? error.message : "Unknown error" },
+      { error: "Failed to fetch notes", details: errorMessage },
       { status: 500 }
     );
   }
@@ -33,10 +42,11 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    console.log("[Notes API] POST - Starting request");
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      console.warn("[Notes API] POST - Unauthorized: No user session");
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      console.warn("[Notes API] POST - No user session");
+      return NextResponse.json({ error: "Unauthorized", details: "No user ID" }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -61,8 +71,10 @@ export async function POST(req: NextRequest) {
     }, { status: 201 });
   } catch (error) {
     console.error("[Notes API] POST - Error:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("[Notes API] POST - Error details:", errorMessage);
     return NextResponse.json(
-      { error: "Failed to create note", details: error instanceof Error ? error.message : "Unknown error" },
+      { error: "Failed to create note", details: errorMessage },
       { status: 500 }
     );
   }
@@ -70,10 +82,11 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    console.log("[Notes API] PUT - Starting request");
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      console.warn("[Notes API] PUT - Unauthorized: No user session");
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      console.warn("[Notes API] PUT - No user session");
+      return NextResponse.json({ error: "Unauthorized", details: "No user ID" }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -100,19 +113,22 @@ export async function PUT(req: NextRequest) {
     });
   } catch (error) {
     console.error("[Notes API] PUT - Error:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("[Notes API] PUT - Error details:", errorMessage);
     return NextResponse.json(
-      { error: "Failed to save notes", details: error instanceof Error ? error.message : "Unknown error" },
+      { error: "Failed to save notes", details: errorMessage },
       { status: 500 }
     );
   }
 }
 
-export async function DELETE() {
+export async function DELETE(req: NextRequest) {
   try {
+    console.log("[Notes API] DELETE - Starting request");
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      console.warn("[Notes API] DELETE - Unauthorized: No user session");
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      console.warn("[Notes API] DELETE - No user session");
+      return NextResponse.json({ error: "Unauthorized", details: "No user ID" }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -124,8 +140,10 @@ export async function DELETE() {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("[Notes API] DELETE - Error:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("[Notes API] DELETE - Error details:", errorMessage);
     return NextResponse.json(
-      { error: "Failed to delete note", details: error instanceof Error ? error.message : "Unknown error" },
+      { error: "Failed to delete note", details: errorMessage },
       { status: 500 }
     );
   }

@@ -31,11 +31,12 @@ export default function NotesPage() {
         if (!res.ok) {
           const errorData = await res.json();
           console.error("[Notes Page] Fetch failed:", errorData);
-          throw new Error(errorData.error || `HTTP ${res.status}`);
+          const errorMessage = errorData.details ? `${errorData.error}: ${errorData.details}` : (errorData.error || `HTTP ${res.status}`);
+          throw new Error(errorMessage);
         }
 
         const data = await res.json();
-        console.log("[Notes Page] Fetch successful");
+        console.log("[Notes Page] Fetch successful", data);
         return data;
       } catch (err) {
         console.error("[Notes Page] Fetch error:", err);
