@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: "GCashFin — Financial Management System",
   description: "Professional GCash account & salary tracking system",
   icons: {
-    icon: "/favicon.png",
+    icon: "/favicon.ico",
   },
 };
 
