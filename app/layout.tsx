@@ -12,7 +12,11 @@ export const metadata: Metadata = {
   description: "Professional GCash account & salary tracking system",
   icons: {
     icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
   },
+  manifest: "/manifest.json",
+  viewport: "width=device-width, initial-scale=1",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
