@@ -10,6 +10,9 @@ const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-body" });
 export const metadata: Metadata = {
   title: "GCashFin — Financial Management System",
   description: "Professional GCash account & salary tracking system",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
