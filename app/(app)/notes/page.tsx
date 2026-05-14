@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { Save, FileText, Trash2 } from "lucide-react";
@@ -13,10 +13,18 @@ interface NoteResponse {
   details?: string;
 }
 
+type SavePayload = {
+  content: string;
+  quiet?: boolean;
+};
+
 export default function NotesPage() {
   const qc = useQueryClient();
   const [content, setContent] = useState("");
   const [noteId, setNoteId] = useState<string | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [saveStatus, setSaveStatus] = useState("All changes saved");
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { data: noteData, isLoading, error: fetchError } = useQuery<NoteResponse>({
     queryKey: ["notes"],
@@ -51,11 +59,44 @@ export default function NotesPage() {
     if (noteData?.success) {
       setContent(noteData.content || "");
       setNoteId(noteData.id || null);
+      setHasUnsavedChanges(false);
+      setSaveStatus("All changes saved");
     }
   }, [noteData]);
 
-  const saveMut = useMutation({
-    mutationFn: async (contentToSave: string) => {
+  useEffect(() => {
+    if (!hasUnsavedChanges || saveMut.isPending) return;
+    if (!content.trim() && !noteId) return;
+
+    if (saveTimer.current) {
+      clearTimeout(saveTimer.current);
+    }
+
+    saveTimer.current = setTimeout(() => {
+      saveMut.mutate({ content, quiet: true });
+    }, 1200);
+
+    return () => {
+      if (saveTimer.current) {
+        clearTimeout(saveTimer.current);
+      }
+    };
+  }, [content, hasUnsavedChanges, noteId, saveMut]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        event.preventDefault();
+        event.returnValue = "You have unsaved changes.";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
+  const saveMut = useMutation<NoteResponse, Error, SavePayload>({
+    mutationFn: async ({ content: contentToSave }) => {
       try {
         console.log("[Notes Page] Saving notes...");
         const res = await fetch("/api/notes", {
@@ -78,15 +119,25 @@ export default function NotesPage() {
         throw err;
       }
     },
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       if (data.note?.id) setNoteId(data.note.id);
       qc.invalidateQueries({ queryKey: ["notes"] });
-      toast.success("Notes saved!");
+
+      if (variables?.quiet) {
+        setSaveStatus("Auto-saved");
+      } else {
+        toast.success("Notes saved!");
+        setSaveStatus("All changes saved");
+      }
+      setHasUnsavedChanges(false);
     },
-    onError: (error) => {
+    onError: (error, variables) => {
       const message = error instanceof Error ? error.message : "Failed to save notes";
       console.error("[Notes Page] Mutation error:", message);
-      toast.error(message);
+      if (!variables?.quiet) {
+        toast.error(message);
+      }
+      setSaveStatus("Save failed");
     },
   });
 
@@ -126,12 +177,20 @@ export default function NotesPage() {
   });
 
   const handleSave = useCallback(() => {
-    if (!content.trim()) {
+    if (!content.trim() && !noteId) {
       toast.error("Cannot save empty notes");
       return;
     }
-    saveMut.mutate(content);
-  }, [content, saveMut]);
+
+    if (saveTimer.current) {
+      clearTimeout(saveTimer.current);
+      saveTimer.current = null;
+    }
+
+    setSaveStatus("Saving…");
+    saveMut.mutate({ content, quiet: false });
+    setHasUnsavedChanges(false);
+  }, [content, noteId, saveMut]);
 
   const handleDelete = useCallback(() => {
     if (confirm("Are you sure you want to delete all notes?")) {
@@ -189,13 +248,19 @@ export default function NotesPage() {
         </div>
         <textarea
           value={content}
-          onChange={(e) => setContent(e.target.value)}
+          onChange={(e) => {
+            setContent(e.target.value);
+            setHasUnsavedChanges(true);
+            setSaveStatus("Unsaved changes");
+          }}
           placeholder="Start writing your notes here..."
           className="w-full h-[500px] bg-white/[0.04] border border-white/[0.07] rounded px-4 py-3 text-sm text-white placeholder-[#555] focus:outline-none focus:border-[#e74c3c]/50 resize-none transition-colors"
           style={{ fontFamily: "monospace" }}
         />
       </div>
-      <p className="text-[#555] text-xs mt-4 text-right">Auto-saves on demand • Last saved ID: {noteId || "pending"}</p>
+      <p className="text-[#555] text-xs mt-4 text-right">
+        {saveStatus} • Last saved ID: {noteId || "pending"}
+      </p>
     </div>
   );
 }
