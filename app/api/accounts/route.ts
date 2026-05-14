@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
 
   const accounts = await prisma.account.findMany({
     where: whereBase,
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: "asc" },
   });
   const mapped = accounts.map((a) => ({
     ...a,
