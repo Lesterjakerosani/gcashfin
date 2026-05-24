@@ -1,38 +1,26 @@
 "use client";
 import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { Save, LogOut, AlertTriangle, Users, User, Plus, Trash2, Eye, EyeOff } from "lucide-react";
+import { Save, LogOut, AlertTriangle, User, Eye, EyeOff } from "lucide-react";
 
-type Panel = "users" | "profile" | "danger";
+type Panel = "profile" | "danger";
 
 const PANELS: { key: Panel; label: string; icon: any }[] = [
-  { key: "users", label: "User Management", icon: Users },
   { key: "profile", label: "My Profile", icon: User },
   { key: "danger", label: "Danger Zone", icon: AlertTriangle },
 ];
 
-type SysUser = { id: string; name: string; email: string; role: string; createdAt: string };
-
-export default function AdminPage() {
+export default function SettingsPage() {
   const { data: session } = useSession();
-  const qc = useQueryClient();
-  const [panel, setPanel] = useState<Panel>("users");
+  const [panel, setPanel] = useState<Panel>("profile");
 
   const [name, setName] = useState(session?.user?.name || "");
   const [oldPw, setOldPw] = useState("");
   const [newPw, setNewPw] = useState("");
   const [confPw, setConfPw] = useState("");
   const [showPw, setShowPw] = useState(false);
-
-  const [addForm, setAddForm] = useState({ name: "", email: "", password: "" });
-  const [showAddForm, setShowAddForm] = useState(false);
-
-  const { data: users = [] } = useQuery<SysUser[]>({
-    queryKey: ["admin-users"],
-    queryFn: () => fetch("/api/admin/users").then(r => r.json()),
-  });
 
   const saveMut = useMutation({
     mutationFn: async () => {
@@ -64,43 +52,6 @@ export default function AdminPage() {
     onError: (e: any) => toast.error(e?.message || "Password update failed."),
   });
 
-  const addUserMut = useMutation({
-    mutationFn: async () => {
-      const res = await fetch("/api/admin/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...addForm, role: "user" }),
-      });
-      const body = await res.json();
-      if (!res.ok) throw new Error(body.error || "Failed");
-      return body;
-    },
-    onSuccess: () => {
-      toast.success("User created!");
-      qc.invalidateQueries({ queryKey: ["admin-users"] });
-      setAddForm({ name: "", email: "", password: "" });
-      setShowAddForm(false);
-    },
-    onError: (e: any) => toast.error(e?.message || "Failed to create user."),
-  });
-
-  const deleteUserMut = useMutation({
-    mutationFn: async (id: string) => {
-      const res = await fetch("/api/admin/users", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      });
-      const body = await res.json();
-      if (!res.ok) throw new Error(body.error || "Failed");
-    },
-    onSuccess: () => {
-      toast.success("User deleted.");
-      qc.invalidateQueries({ queryKey: ["admin-users"] });
-    },
-    onError: (e: any) => toast.error(e?.message || "Failed to delete user."),
-  });
-
   function handleChangePw(e: React.FormEvent) {
     e.preventDefault();
     if (!oldPw || !newPw || !confPw) { toast.error("Fill all fields."); return; }
@@ -113,7 +64,7 @@ export default function AdminPage() {
     <div className="space-y-6">
       <div>
         <h1 className="page-title">Settings</h1>
-        <p className="page-subtitle">Manage users and your account</p>
+        <p className="page-subtitle">Manage your account</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-5">
@@ -138,94 +89,6 @@ export default function AdminPage() {
         </div>
 
         <div>
-          {/* User Management */}
-          {panel === "users" && (
-            <div className="card p-6">
-              <div className="flex items-center justify-between mb-5">
-                <h2 className="section-title">User Management</h2>
-                <button onClick={() => setShowAddForm(v => !v)} className="btn-primary text-xs px-3 py-2">
-                  <Plus size={13} /> Add User
-                </button>
-              </div>
-
-              {showAddForm && (
-                <div className="mb-5 p-4 bg-gray-50 dark:bg-slate-700/30 border border-gray-200 dark:border-slate-600 rounded-xl">
-                  <p className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-3">New User</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
-                    <div>
-                      <label className="label">Name</label>
-                      <input value={addForm.name} onChange={e => setAddForm(f => ({ ...f, name: e.target.value }))}
-                        placeholder="Full name" className="input-field" />
-                    </div>
-                    <div>
-                      <label className="label">Email</label>
-                      <input type="email" value={addForm.email} onChange={e => setAddForm(f => ({ ...f, email: e.target.value }))}
-                        placeholder="email@example.com" className="input-field" />
-                    </div>
-                    <div>
-                      <label className="label">Password</label>
-                      <input type="password" value={addForm.password} onChange={e => setAddForm(f => ({ ...f, password: e.target.value }))}
-                        placeholder="Min 6 characters" className="input-field" />
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <button onClick={() => addUserMut.mutate()} disabled={addUserMut.isPending} className="btn-primary text-sm">
-                      <Plus size={13} /> {addUserMut.isPending ? "Creating…" : "Create User"}
-                    </button>
-                    <button onClick={() => setShowAddForm(false)} className="btn-secondary text-sm">
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              <div className="table-container">
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr>
-                      {["Name", "Email", "Joined", "Actions"].map(h => (
-                        <th key={h} className="th">{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {users.length === 0 ? (
-                      <tr><td colSpan={4} className="text-center py-8 text-gray-400 dark:text-slate-500 text-sm">No users found.</td></tr>
-                    ) : users.map(u => (
-                      <tr key={u.id} className="tr-hover">
-                        <td className="td">
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
-                              {u.name[0].toUpperCase()}
-                            </div>
-                            <span className="font-medium text-gray-900 dark:text-white">{u.name}</span>
-                            {u.id === (session?.user as any)?.id && (
-                              <span className="badge-gray text-[10px]">you</span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="td text-gray-500 dark:text-slate-400">{u.email}</td>
-                        <td className="td text-gray-400 dark:text-slate-500">
-                          {new Date(u.createdAt).toLocaleDateString("en-PH", { year: "numeric", month: "short", day: "numeric" })}
-                        </td>
-                        <td className="td">
-                          <button
-                            onClick={() => { if (confirm(`Delete user "${u.name}"?`)) deleteUserMut.mutate(u.id); }}
-                            disabled={u.id === (session?.user as any)?.id}
-                            className="text-gray-300 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                            title={u.id === (session?.user as any)?.id ? "Cannot delete yourself" : "Delete user"}
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
           {/* My Profile */}
           {panel === "profile" && (
             <div className="card p-6 space-y-5">
