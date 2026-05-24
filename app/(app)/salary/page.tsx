@@ -22,7 +22,7 @@ export default function SalaryPage() {
   const [month, setMonth] = useState(now.getMonth());
   const [year, setYear] = useState(now.getFullYear());
   const [currentPHDate, setCurrentPHDate] = useState(getPHDate());
-  const [form, setForm] = useState({ date: currentPHDate, type: "profit", amount: "", category: "Profit", notes: "" });
+  const [form, setForm] = useState({ type: "profit", amount: "", category: "Profit", notes: "" });
   const [editNotes, setEditNotes] = useState<Record<string, string>>({});
 
   useEffect(() => {
