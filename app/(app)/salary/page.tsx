@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { Plus, Trash2, Download, TrendingUp, TrendingDown, DollarSign } from "lucide-react";
-import { fmt, MSHORT, MONTHS } from "@/lib/utils";
+import { fmt, MSHORT, MONTHS, todayStr } from "@/lib/utils";
 
 type Entry = { id: string; date: string; type: string; amount: number; category: string; notes?: string; createdAt: string; };
 
@@ -17,7 +17,7 @@ export default function SalaryPage() {
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth());
   const [year, setYear] = useState(now.getFullYear());
-  const [form, setForm] = useState({ date: new Date().toISOString().slice(0,10), type: "profit", amount: "", category: "Profit", notes: "" });
+  const [form, setForm] = useState({ date: todayStr(), type: "profit", amount: "", category: "Profit", notes: "" });
   const [editNotes, setEditNotes] = useState<Record<string, string>>({});
 
   const { data: entries = [] } = useQuery<Entry[]>({
@@ -227,7 +227,7 @@ export default function SalaryPage() {
                 const profit = dayEntries.filter(e=>e.type==="profit").reduce((s,e)=>s+e.amount,0);
                 const expense = dayEntries.filter(e=>e.type==="expense").reduce((s,e)=>s+e.amount,0);
                 const net = profit - expense;
-                const isToday = ds === new Date().toISOString().slice(0,10);
+                const isToday = ds === todayStr();
                 return (
                   <tr key={ds} className={`tr-hover ${isToday ? "bg-emerald-50/50 dark:bg-emerald-900/10" : ""}`}>
                     <td className="td text-gray-400 dark:text-[#B0B3B8] w-12">{String(day).padStart(2,"0")}</td>
