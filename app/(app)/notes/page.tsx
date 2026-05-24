@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { Save, FileText, Trash2 } from "lucide-react";
+import { FileText, Trash2, Cloud, CloudOff } from "lucide-react";
 
 interface NoteResponse {
   success: boolean;
@@ -18,12 +18,26 @@ type SavePayload = {
   quiet?: boolean;
 };
 
+type SaveStatus = "saved" | "saving" | "unsaved" | "error";
+
 export default function NotesPage() {
   const qc = useQueryClient();
   const [content, setContent] = useState("");
   const [noteId, setNoteId] = useState<string | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved");
+  const [statusVisible, setStatusVisible] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const fadeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showStatus = (status: SaveStatus, autohide = false) => {
+    setSaveStatus(status);
+    setStatusVisible(true);
+    if (fadeTimer.current) clearTimeout(fadeTimer.current);
+    if (autohide) {
+      fadeTimer.current = setTimeout(() => setStatusVisible(false), 2500);
+    }
+  };
 
   const { data: noteData, isLoading, error: fetchError } = useQuery<NoteResponse>({
     queryKey: ["notes"],
@@ -35,7 +49,9 @@ export default function NotesPage() {
 
       if (!res.ok) {
         const errorData = await res.json();
-        const errorMessage = errorData.details ? `${errorData.error}: ${errorData.details}` : (errorData.error || `HTTP ${res.status}`);
+        const errorMessage = errorData.details
+          ? `${errorData.error}: ${errorData.details}`
+          : errorData.error || `HTTP ${res.status}`;
         throw new Error(errorMessage);
       }
 
@@ -64,16 +80,17 @@ export default function NotesPage() {
       if (data.note?.id) setNoteId(data.note.id);
       setHasUnsavedChanges(false);
 
-      if (!variables?.quiet) {
-        // Only update query cache and show toast on manual save
+      if (variables?.quiet) {
+        showStatus("saved", true);
+      } else {
         qc.invalidateQueries({ queryKey: ["notes"] });
-        toast.success("Notes saved!");
+        showStatus("saved", true);
       }
     },
-    onError: (error, variables) => {
-      const message = error instanceof Error ? error.message : "Failed to save notes";
+    onError: (_error, variables) => {
+      showStatus("error", false);
       if (!variables?.quiet) {
-        toast.error(message);
+        toast.error("Failed to save notes");
       }
     },
   });
@@ -95,6 +112,9 @@ export default function NotesPage() {
     onSuccess: () => {
       setContent("");
       setNoteId(null);
+      setHasUnsavedChanges(false);
+      setSaveStatus("saved");
+      setStatusVisible(false);
       qc.invalidateQueries({ queryKey: ["notes"] });
       toast.success("Notes deleted!");
     },
@@ -115,6 +135,7 @@ export default function NotesPage() {
       saveTimer.current = null;
     }
 
+    showStatus("saving");
     saveMut.mutate({ content, quiet: false });
     setHasUnsavedChanges(false);
   }, [content, noteId, saveMut]);
@@ -125,7 +146,6 @@ export default function NotesPage() {
     }
   }, [deleteMut]);
 
-  // Load initial note data into state
   useEffect(() => {
     if (noteData?.success) {
       setContent(noteData.content || "");
@@ -134,14 +154,15 @@ export default function NotesPage() {
     }
   }, [noteData]);
 
-  // Silent auto-save 100ms after user stops typing — no status changes, no refetch
+  // Google Docs-style auto-save: 1s after user stops typing
   useEffect(() => {
     if (!hasUnsavedChanges || saveMut.isPending) return;
     if (!content.trim() && !noteId) return;
 
     saveTimer.current = setTimeout(() => {
+      showStatus("saving");
       saveMut.mutate({ content, quiet: true });
-    }, 2000);
+    }, 1000);
 
     return () => {
       if (saveTimer.current) clearTimeout(saveTimer.current);
@@ -179,6 +200,20 @@ export default function NotesPage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [content, handleSave, noteId, saveMut.isPending]);
 
+  const statusLabel = {
+    saving: "Saving...",
+    saved: "All changes saved",
+    unsaved: "Unsaved changes",
+    error: "Save failed",
+  }[saveStatus];
+
+  const statusColor = {
+    saving: "text-[#888]",
+    saved: "text-[#4caf50]",
+    unsaved: "text-[#888]",
+    error: "text-red-400",
+  }[saveStatus];
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -195,7 +230,9 @@ export default function NotesPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center bg-[rgba(15,15,15,0.92)] border border-red-700/30 rounded-lg p-6 max-w-md">
           <p className="text-red-500 mb-2">Error loading notes:</p>
-          <p className="text-[#888] text-sm">{fetchError instanceof Error ? fetchError.message : "Unknown error"}</p>
+          <p className="text-[#888] text-sm">
+            {fetchError instanceof Error ? fetchError.message : "Unknown error"}
+          </p>
         </div>
       </div>
     );
@@ -203,13 +240,28 @@ export default function NotesPage() {
 
   return (
     <div>
-      <div className="font-display text-4xl tracking-[4px] text-white mb-1">NOTES <span className="text-[#e74c3c]">PAD</span></div>
+      <div className="font-display text-4xl tracking-[4px] text-white mb-1">
+        NOTES <span className="text-[#e74c3c]">PAD</span>
+      </div>
       <p className="text-[#888] text-sm mb-6">Your personal notepad</p>
 
       <div className="bg-[rgba(15,15,15,0.92)] border border-white/[0.07] rounded-lg p-6">
         <div className="flex items-center gap-2 mb-4 flex-wrap">
           <FileText size={20} className="text-[#888]" />
           <span className="text-white font-semibold">My Notes</span>
+
+          {/* Google Docs-style subtle save status */}
+          <div
+            className={`flex items-center gap-1.5 ml-3 transition-opacity duration-500 ${statusVisible ? "opacity-100" : "opacity-0"}`}
+          >
+            {saveStatus === "error" ? (
+              <CloudOff size={13} className="text-red-400" />
+            ) : (
+              <Cloud size={13} className={saveStatus === "saving" ? "text-[#888] animate-pulse" : "text-[#4caf50]"} />
+            )}
+            <span className={`text-xs ${statusColor}`}>{statusLabel}</span>
+          </div>
+
           <div className="ml-auto flex items-center gap-2">
             <button
               onClick={handleDelete}
@@ -218,13 +270,6 @@ export default function NotesPage() {
             >
               <Trash2 size={12} /> {deleteMut.isPending ? "Deleting…" : "Delete"}
             </button>
-            <button
-              onClick={handleSave}
-              disabled={saveMut.isPending}
-              className="flex items-center gap-2 bg-[#c0392b] hover:bg-[#e74c3c] text-white px-4 py-1.5 rounded text-sm font-semibold tracking-wide transition-all disabled:opacity-50"
-            >
-              <Save size={14} /> Save
-            </button>
           </div>
         </div>
         <textarea
@@ -232,12 +277,14 @@ export default function NotesPage() {
           onChange={(e) => {
             setContent(e.target.value);
             setHasUnsavedChanges(true);
+            showStatus("unsaved");
           }}
           placeholder="Start writing your notes here..."
           className="w-full h-[500px] bg-white/[0.04] border border-white/[0.07] rounded px-4 py-3 text-sm text-white placeholder-[#555] focus:outline-none focus:border-[#e74c3c]/50 resize-none transition-colors"
           style={{ fontFamily: "monospace" }}
         />
       </div>
+      <p className="text-[#444] text-xs mt-3 text-right">Ctrl+S to save manually</p>
     </div>
   );
 }
