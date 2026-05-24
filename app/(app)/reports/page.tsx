@@ -87,7 +87,7 @@ export default function ReportsPage() {
           <p className="page-subtitle">Daily profit tracking and analysis</p>
         </div>
         <div className="flex items-center gap-2">
-          <Calendar size={14} className="text-gray-400 dark:text-slate-500" />
+          <Calendar size={14} className="text-gray-400 dark:text-[#B0B3B8]" />
           <select
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(e.target.value)}
@@ -104,37 +104,37 @@ export default function ReportsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="stat-card">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+            <span className="text-xs font-medium text-gray-500 dark:text-[#B0B3B8] uppercase tracking-wider">
               {selectedMonth === "all" ? "Total Year Profit" : `${MONTHS[Number(selectedMonth)]} Profit`}
             </span>
             <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center">
               <BarChart2 size={15} className="text-emerald-600 dark:text-emerald-400" />
             </div>
           </div>
-          <div className="text-2xl font-medium text-gray-900 dark:text-white">
+          <div className="text-2xl font-medium text-gray-900 dark:text-[#E4E6EB]">
             ₱{fmt(selectedMonth === "all" ? totalYearProfit : selectedMonthProfit)}
           </div>
         </div>
         <div className="stat-card">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Year Total Profit</span>
+            <span className="text-xs font-medium text-gray-500 dark:text-[#B0B3B8] uppercase tracking-wider">Year Total Profit</span>
             <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
               <BarChart2 size={15} className="text-blue-600 dark:text-blue-400" />
             </div>
           </div>
-          <div className="text-2xl font-medium text-gray-900 dark:text-white">₱{fmt(totalYearProfit)}</div>
+          <div className="text-2xl font-medium text-gray-900 dark:text-[#E4E6EB]">₱{fmt(totalYearProfit)}</div>
         </div>
       </div>
 
       {/* Daily Profit List */}
       <div className="table-container">
-        <div className="px-5 py-4 border-b border-gray-100 dark:border-slate-700">
+        <div className="px-5 py-4 border-b border-gray-100 dark:border-[#3E4042]">
           <h2 className="section-title">Daily Breakdown</h2>
-          <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">Showing {dates.length} days • Auto-scrolls to today</p>
+          <p className="text-xs text-gray-400 dark:text-[#B0B3B8] mt-0.5">Showing {dates.length} days • Auto-scrolls to today</p>
         </div>
         <div className="max-h-[calc(100vh-400px)] overflow-y-auto divide-y divide-gray-100 dark:divide-slate-700/50">
           {dates.length === 0 ? (
-            <div className="text-center py-10 text-gray-400 dark:text-slate-500 text-sm">No data available.</div>
+            <div className="text-center py-10 text-gray-400 dark:text-[#B0B3B8] text-sm">No data available.</div>
           ) : (
             dates.map((dateObj) => {
               const isToday =
@@ -149,21 +149,21 @@ export default function ReportsPage() {
                   className={`flex items-center gap-4 px-5 py-3 transition-colors ${
                     isToday
                       ? "bg-emerald-50 dark:bg-emerald-900/10 border-l-2 border-emerald-500"
-                      : "hover:bg-gray-50 dark:hover:bg-slate-700/20"
+                      : "hover:bg-gray-50 dark:hover:bg-[#3A3B3C]/20"
                   }`}
                 >
                   <div className="w-20 flex-shrink-0">
-                    <div className="text-sm font-semibold text-gray-800 dark:text-slate-200">
+                    <div className="text-sm font-semibold text-gray-800 dark:text-[#E4E6EB]">
                       {MONTHS[dateObj.month].slice(0, 3)} {dateObj.day}
                     </div>
-                    <div className="text-[10px] text-gray-400 dark:text-slate-500">{dateObj.dateStr}</div>
+                    <div className="text-[10px] text-gray-400 dark:text-[#B0B3B8]">{dateObj.dateStr}</div>
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="h-4 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div className="h-4 bg-gray-100 dark:bg-[#3A3B3C] rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all duration-300 ${
-                          dateObj.profit > 0 ? "bg-emerald-500" : "bg-gray-200 dark:bg-slate-600"
+                          dateObj.profit > 0 ? "bg-emerald-500" : "bg-gray-200 dark:bg-[#3A3B3C]"
                         }`}
                         style={{
                           width: `${Math.max(((dateObj.profit / maxProfit) * 100), dateObj.profit > 0 ? 2 : 0)}%`

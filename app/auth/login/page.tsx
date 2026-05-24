@@ -23,21 +23,21 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#18191A] flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl shadow-lg mb-4">
             <TrendingUp size={26} className="text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">GCashFin</h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">Financial Management System</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-[#E4E6EB] tracking-tight">GCashFin</h1>
+          <p className="text-sm text-gray-500 dark:text-[#B0B3B8] mt-1">Financial Management System</p>
         </div>
 
         {/* Card */}
         <div className="card p-8">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Sign in</h2>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mb-6">Access your financial dashboard</p>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-[#E4E6EB] mb-1">Sign in</h2>
+          <p className="text-sm text-gray-500 dark:text-[#B0B3B8] mb-6">Access your financial dashboard</p>
 
           {error && (
             <div className="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 text-red-600 dark:text-red-400 text-sm px-4 py-3 rounded-xl mb-5">
@@ -83,9 +83,9 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="text-center text-gray-400 dark:text-slate-500 text-sm mt-6">
+          <p className="text-center text-gray-400 dark:text-[#B0B3B8] text-sm mt-6">
             No account?{" "}
-            <Link href="/auth/register" className="text-gray-900 dark:text-white font-medium hover:underline transition-colors">
+            <Link href="/auth/register" className="text-gray-900 dark:text-[#E4E6EB] font-medium hover:underline transition-colors">
               Create one
             </Link>
           </p>

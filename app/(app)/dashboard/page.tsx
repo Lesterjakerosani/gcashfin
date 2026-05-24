@@ -16,7 +16,7 @@ const CATS = ["Personal", "Business", "Savings", "Shared"];
 
 function StatCard({ label, value, sub, color = "gray" }: { label: string; value: string | number; sub?: string; color?: string }) {
   const colors: Record<string, string> = {
-    gray: "text-gray-900 dark:text-white",
+    gray: "text-gray-900 dark:text-[#E4E6EB]",
     green: "text-emerald-600 dark:text-emerald-400",
     blue: "text-blue-600 dark:text-blue-400",
     red: "text-red-500 dark:text-red-400",
@@ -24,9 +24,9 @@ function StatCard({ label, value, sub, color = "gray" }: { label: string; value:
   };
   return (
     <div className="stat-card">
-      <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">{label}</p>
+      <p className="text-xs font-medium text-gray-500 dark:text-[#B0B3B8] uppercase tracking-wider mb-2">{label}</p>
       <p className={`text-2xl font-medium ${colors[color]} leading-none`}>{value}</p>
-      {sub && <p className="text-xs text-gray-400 dark:text-slate-500 mt-1.5">{sub}</p>}
+      {sub && <p className="text-xs text-gray-400 dark:text-[#B0B3B8] mt-1.5">{sub}</p>}
     </div>
   );
 }
@@ -35,10 +35,10 @@ function UsageBar({ pct }: { pct: number }) {
   const color = pct >= 100 ? "bg-red-500" : pct >= 75 ? "bg-amber-500" : "bg-emerald-500";
   return (
     <div className="space-y-1">
-      <div className="w-20 h-1.5 bg-gray-100 dark:bg-slate-600 rounded-full overflow-hidden">
+      <div className="w-20 h-1.5 bg-gray-100 dark:bg-[#3A3B3C] rounded-full overflow-hidden">
         <div className={`h-full ${color} rounded-full transition-all`} style={{ width: `${Math.min(100, pct)}%` }} />
       </div>
-      <span className="text-[11px] text-gray-400 dark:text-slate-400">{pct.toFixed(1)}%</span>
+      <span className="text-[11px] text-gray-400 dark:text-[#B0B3B8]">{pct.toFixed(1)}%</span>
     </div>
   );
 }
@@ -150,7 +150,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between mb-3">
           <div>
             <h2 className="section-title">Account Management</h2>
-            <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">Manage and monitor your GCash accounts</p>
+            <p className="text-xs text-gray-400 dark:text-[#B0B3B8] mt-0.5">Manage and monitor your GCash accounts</p>
           </div>
           <button onClick={openAdd} className="btn-primary">
             <Plus size={14} /> Add Account
@@ -182,7 +182,7 @@ export default function DashboardPage() {
               </thead>
               <tbody>
                 {accounts.length === 0 ? (
-                  <tr><td colSpan={12} className="text-center py-14 text-gray-400 dark:text-slate-500">
+                  <tr><td colSpan={12} className="text-center py-14 text-gray-400 dark:text-[#B0B3B8]">
                     <div className="text-3xl mb-2">📱</div>
                     <div className="text-sm">No accounts yet. Add your first GCash account.</div>
                   </td></tr>
@@ -192,33 +192,33 @@ export default function DashboardPage() {
                   const st = getStatus(a);
                   return (
                     <tr key={a.id} className="tr-hover">
-                      <td className="td text-gray-400 dark:text-slate-500 text-xs">{i + 1}</td>
+                      <td className="td text-gray-400 dark:text-[#B0B3B8] text-xs">{i + 1}</td>
                       <td className="td">
                         <div className="flex items-center gap-2">
                           <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: a.color }} />
-                          <span className="font-medium text-gray-900 dark:text-white">{a.model}</span>
+                          <span className="font-medium text-gray-900 dark:text-[#E4E6EB]">{a.model}</span>
                         </div>
                       </td>
-                      <td className="td font-mono text-xs text-gray-500 dark:text-slate-400">{a.phone}</td>
+                      <td className="td font-mono text-xs text-gray-500 dark:text-[#B0B3B8]">{a.phone}</td>
                       <td className="td"><span className="badge-gray">{a.category}</span></td>
                       <td className="td font-mono text-emerald-600 dark:text-emerald-400">₱{fmt(a.used)}</td>
-                      <td className="td font-mono text-gray-500 dark:text-slate-400">₱{fmt(a.limit)}</td>
-                      <td className="td font-mono text-gray-900 dark:text-white">₱{fmt(avail)}</td>
+                      <td className="td font-mono text-gray-500 dark:text-[#B0B3B8]">₱{fmt(a.limit)}</td>
+                      <td className="td font-mono text-gray-900 dark:text-[#E4E6EB]">₱{fmt(avail)}</td>
                       <td className="td"><UsageBar pct={pct} /></td>
                       <td className="td"><span className={st.cls}>{st.label}</span></td>
                       <td className="td">
                         <input type="number" placeholder="0.00" value={amtInputs[a.id] || ""}
                           onChange={e => setAmtInputs(p => ({ ...p, [a.id]: e.target.value }))}
-                          className="w-24 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg px-2 py-1.5 text-xs text-right focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono" />
+                          className="w-24 bg-gray-50 dark:bg-[#3A3B3C] border border-gray-200 dark:border-[#3E4042] rounded-lg px-2 py-1.5 text-xs text-right focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono" />
                       </td>
-                      <td className="td text-xs text-gray-400 dark:text-slate-500 max-w-[90px] truncate">{a.notes || "—"}</td>
+                      <td className="td text-xs text-gray-400 dark:text-[#B0B3B8] max-w-[90px] truncate">{a.notes || "—"}</td>
                       <td className="td">
                         <div className="flex items-center gap-1">
                           <button onClick={() => handleTx(a.id, "Add")} title="Add" className="w-7 h-7 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center transition-colors"><Plus size={11} /></button>
-                          <button onClick={() => handleTx(a.id, "Deduct")} title="Deduct" className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-600 dark:text-slate-300 flex items-center justify-center transition-colors"><Minus size={11} /></button>
-                          <button onClick={() => handleTx(a.id, "Reset")} title="Reset" className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-500 dark:text-slate-400 flex items-center justify-center transition-colors"><RefreshCw size={11} /></button>
+                          <button onClick={() => handleTx(a.id, "Deduct")} title="Deduct" className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-[#3A3B3C] hover:bg-gray-200 dark:hover:bg-[#3A3B3C] text-gray-600 dark:text-[#E4E6EB] flex items-center justify-center transition-colors"><Minus size={11} /></button>
+                          <button onClick={() => handleTx(a.id, "Reset")} title="Reset" className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-[#3A3B3C] hover:bg-gray-200 dark:hover:bg-[#3A3B3C] text-gray-500 dark:text-[#B0B3B8] flex items-center justify-center transition-colors"><RefreshCw size={11} /></button>
                           <button onClick={() => openEdit(a)} title="Edit" className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center transition-colors"><Edit2 size={11} /></button>
-                          <button onClick={() => archMut.mutate({ id: a.id, archived: !a.archived })} title="Archive" className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-500 flex items-center justify-center transition-colors"><Archive size={11} /></button>
+                          <button onClick={() => archMut.mutate({ id: a.id, archived: !a.archived })} title="Archive" className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-[#3A3B3C] hover:bg-gray-200 dark:hover:bg-[#3A3B3C] text-gray-500 flex items-center justify-center transition-colors"><Archive size={11} /></button>
                           <button onClick={() => { if (confirm("Delete this account?")) delMut.mutate(a.id); }} title="Delete" className="w-7 h-7 rounded-lg bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 text-red-500 flex items-center justify-center transition-colors"><Trash2 size={11} /></button>
                         </div>
                       </td>
@@ -236,7 +236,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between mb-3">
           <div>
             <h2 className="section-title">Transaction History</h2>
-            <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">All account activity</p>
+            <p className="text-xs text-gray-400 dark:text-[#B0B3B8] mt-0.5">All account activity</p>
           </div>
         </div>
         <div className="flex flex-wrap gap-2 mb-3">
@@ -261,24 +261,24 @@ export default function DashboardPage() {
               </thead>
               <tbody>
                 {!txData?.transactions?.length ? (
-                  <tr><td colSpan={11} className="text-center py-10 text-gray-400 dark:text-slate-500 text-sm">No transactions found.</td></tr>
+                  <tr><td colSpan={11} className="text-center py-10 text-gray-400 dark:text-[#B0B3B8] text-sm">No transactions found.</td></tr>
                 ) : txData.transactions.map((t: Tx) => {
                   const d = new Date(t.createdAt);
                   const typeCls = t.type === "Add" ? "badge-green" : t.type === "Deduct" ? "badge-red" : "badge-gray";
                   return (
                     <tr key={t.id} className="tr-hover">
-                      <td className="td font-mono text-xs text-gray-400 dark:text-slate-500">{t.id.slice(-8)}</td>
+                      <td className="td font-mono text-xs text-gray-400 dark:text-[#B0B3B8]">{t.id.slice(-8)}</td>
                       <td className="td text-xs">{d.toLocaleDateString("en-PH")}</td>
                       <td className="td text-xs">{d.toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit" })}</td>
                       <td className="td"><span className={typeCls}>{t.type}</span></td>
                       <td className="td font-mono text-xs">{t.phone}</td>
-                      <td className="td font-medium text-gray-900 dark:text-white">{t.account}</td>
-                      <td className="td text-gray-500 dark:text-slate-400">{t.category}</td>
+                      <td className="td font-medium text-gray-900 dark:text-[#E4E6EB]">{t.account}</td>
+                      <td className="td text-gray-500 dark:text-[#B0B3B8]">{t.category}</td>
                       <td className={`td font-mono ${t.type === "Add" ? "text-emerald-600 dark:text-emerald-400" : t.type === "Deduct" ? "text-red-500 dark:text-red-400" : "text-gray-500"}`}>
                         {t.type === "Add" ? "+" : t.type === "Deduct" ? "-" : ""}₱{fmt(t.amount)}
                       </td>
-                      <td className="td font-mono text-gray-900 dark:text-white">₱{fmt(t.balAfter)}</td>
-                      <td className="td text-xs text-gray-400 dark:text-slate-500">{t.notes || "—"}</td>
+                      <td className="td font-mono text-gray-900 dark:text-[#E4E6EB]">₱{fmt(t.balAfter)}</td>
+                      <td className="td text-xs text-gray-400 dark:text-[#B0B3B8]">{t.notes || "—"}</td>
                       <td className="td"><span className="badge-green">Completed</span></td>
                     </tr>
                   );
@@ -291,13 +291,13 @@ export default function DashboardPage() {
         {/* Pagination */}
         {txData?.pages > 1 && (
           <div className="flex justify-end gap-1 mt-3">
-            <button disabled={txPage <= 1} onClick={() => setTxPage(p => p - 1)} className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-slate-700 text-gray-500 disabled:opacity-30 hover:border-gray-300 dark:hover:border-slate-600 transition-colors">
+            <button disabled={txPage <= 1} onClick={() => setTxPage(p => p - 1)} className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-[#3E4042] text-gray-500 disabled:opacity-30 hover:border-gray-300 dark:hover:border-slate-600 transition-colors">
               <ChevronLeft size={14} />
             </button>
             {Array.from({ length: txData.pages }, (_, i) => i + 1).map(p => (
-              <button key={p} onClick={() => setTxPage(p)} className={`w-8 h-8 flex items-center justify-center rounded-lg border text-xs font-medium transition-colors ${p === txPage ? "bg-gray-900 dark:bg-white border-gray-900 dark:border-white text-white dark:text-gray-900" : "border-gray-200 dark:border-slate-700 text-gray-500 hover:border-gray-300 dark:hover:border-slate-600"}`}>{p}</button>
+              <button key={p} onClick={() => setTxPage(p)} className={`w-8 h-8 flex items-center justify-center rounded-lg border text-xs font-medium transition-colors ${p === txPage ? "bg-gray-900 dark:bg-white border-gray-900 dark:border-white text-white dark:text-gray-900" : "border-gray-200 dark:border-[#3E4042] text-gray-500 hover:border-gray-300 dark:hover:border-slate-600"}`}>{p}</button>
             ))}
-            <button disabled={txPage >= txData.pages} onClick={() => setTxPage(p => p + 1)} className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-slate-700 text-gray-500 disabled:opacity-30 hover:border-gray-300 dark:hover:border-slate-600 transition-colors">
+            <button disabled={txPage >= txData.pages} onClick={() => setTxPage(p => p + 1)} className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-[#3E4042] text-gray-500 disabled:opacity-30 hover:border-gray-300 dark:hover:border-slate-600 transition-colors">
               <ChevronRight size={14} />
             </button>
           </div>
@@ -307,13 +307,13 @@ export default function DashboardPage() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl shadow-modal w-full max-w-[480px] animate-in">
-            <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-slate-700">
+          <div className="bg-white dark:bg-[#242526] border border-gray-200 dark:border-[#3E4042] rounded-2xl shadow-modal w-full max-w-[480px] animate-in">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-[#3E4042]">
               <div>
-                <h2 className="text-base font-semibold text-gray-900 dark:text-white">{editId ? "Edit" : "Add"} Account</h2>
-                <p className="text-xs text-gray-400 dark:text-slate-400 mt-0.5">GCash account details</p>
+                <h2 className="text-base font-semibold text-gray-900 dark:text-[#E4E6EB]">{editId ? "Edit" : "Add"} Account</h2>
+                <p className="text-xs text-gray-400 dark:text-[#B0B3B8] mt-0.5">GCash account details</p>
               </div>
-              <button onClick={() => setShowModal(false)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-400 transition-colors"><X size={16} /></button>
+              <button onClick={() => setShowModal(false)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#3A3B3C] text-gray-400 transition-colors"><X size={16} /></button>
             </div>
             <form onSubmit={handleSave} className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-3">

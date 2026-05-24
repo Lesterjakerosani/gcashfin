@@ -97,7 +97,7 @@ export default function SalaryPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="stat-card">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Total Profit</span>
+            <span className="text-xs font-medium text-gray-500 dark:text-[#B0B3B8] uppercase tracking-wider">Total Profit</span>
             <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center">
               <TrendingUp size={15} className="text-emerald-600 dark:text-emerald-400" />
             </div>
@@ -106,7 +106,7 @@ export default function SalaryPage() {
         </div>
         <div className="stat-card">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Total Expense</span>
+            <span className="text-xs font-medium text-gray-500 dark:text-[#B0B3B8] uppercase tracking-wider">Total Expense</span>
             <div className="w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center">
               <TrendingDown size={15} className="text-red-500 dark:text-red-400" />
             </div>
@@ -115,7 +115,7 @@ export default function SalaryPage() {
         </div>
         <div className="stat-card">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Net Income</span>
+            <span className="text-xs font-medium text-gray-500 dark:text-[#B0B3B8] uppercase tracking-wider">Net Income</span>
             <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${netIncome >= 0 ? "bg-emerald-100 dark:bg-emerald-900/30" : "bg-red-100 dark:bg-red-900/30"}`}>
               <DollarSign size={15} className={netIncome >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"} />
             </div>
@@ -145,7 +145,7 @@ export default function SalaryPage() {
                         ? t === "profit"
                           ? "bg-emerald-500 text-white shadow-sm"
                           : "bg-red-500 text-white shadow-sm"
-                        : "bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600"
+                        : "bg-gray-100 dark:bg-[#3A3B3C] text-gray-600 dark:text-[#E4E6EB] hover:bg-gray-200 dark:hover:bg-[#3A3B3C]"
                     }`}>
                     {t}
                   </button>
@@ -174,25 +174,25 @@ export default function SalaryPage() {
 
         {/* Transaction History */}
         <div className="lg:col-span-2 table-container flex flex-col">
-          <div className="px-5 py-4 border-b border-gray-100 dark:border-slate-700">
+          <div className="px-5 py-4 border-b border-gray-100 dark:border-[#3E4042]">
             <h2 className="section-title">Transaction History</h2>
           </div>
           <div className="overflow-y-auto max-h-[480px] flex-1">
             {sortedDates.length === 0 ? (
-              <div className="flex items-center justify-center py-16 text-gray-400 dark:text-slate-500 text-sm">
+              <div className="flex items-center justify-center py-16 text-gray-400 dark:text-[#B0B3B8] text-sm">
                 No entries for {MONTHS[month]} {year}
               </div>
             ) : sortedDates.map(date => (
               <div key={date}>
-                <div className="px-5 py-2 bg-gray-50 dark:bg-slate-900/30 text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider border-b border-gray-100 dark:border-slate-700/50">
+                <div className="px-5 py-2 bg-gray-50 dark:bg-[#18191A]/30 text-xs font-semibold text-gray-500 dark:text-[#B0B3B8] uppercase tracking-wider border-b border-gray-100 dark:border-[#3E4042]/50">
                   {date}
                 </div>
                 {byDate[date].map(e => (
-                  <div key={e.id} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 dark:hover:bg-slate-700/30 border-b border-gray-100 dark:border-slate-700/30 transition-colors">
+                  <div key={e.id} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 dark:hover:bg-[#3A3B3C]/30 border-b border-gray-100 dark:border-[#3E4042]/30 transition-colors">
                     <div className={`w-1 h-8 rounded-full flex-shrink-0 ${e.type === "profit" ? "bg-emerald-500" : "bg-red-500"}`} />
                     <div className="flex-1 min-w-0">
                       <span className={`text-xs font-medium ${e.type === "profit" ? "badge-green" : "badge-red"}`}>{e.category}</span>
-                      <div className="text-xs text-gray-400 dark:text-slate-500 mt-0.5 truncate">{e.notes || "No notes"}</div>
+                      <div className="text-xs text-gray-400 dark:text-[#B0B3B8] mt-0.5 truncate">{e.notes || "No notes"}</div>
                     </div>
                     <div className={`font-mono text-sm flex-shrink-0 ${e.type === "profit" ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"}`}>
                       {e.type === "profit" ? "+" : "-"}₱{fmt(e.amount)}
@@ -210,7 +210,7 @@ export default function SalaryPage() {
 
       {/* Monthly Spreadsheet */}
       <div className="table-container">
-        <div className="px-5 py-4 border-b border-gray-100 dark:border-slate-700 flex items-center justify-between">
+        <div className="px-5 py-4 border-b border-gray-100 dark:border-[#3E4042] flex items-center justify-between">
           <h2 className="section-title">Monthly Spreadsheet — {MONTHS[month]} {year}</h2>
         </div>
         <div className="overflow-x-auto">
@@ -230,22 +230,22 @@ export default function SalaryPage() {
                 const isToday = ds === new Date().toISOString().slice(0,10);
                 return (
                   <tr key={ds} className={`tr-hover ${isToday ? "bg-emerald-50/50 dark:bg-emerald-900/10" : ""}`}>
-                    <td className="td text-gray-400 dark:text-slate-500 w-12">{String(day).padStart(2,"0")}</td>
-                    <td className="td text-gray-500 dark:text-slate-400">
+                    <td className="td text-gray-400 dark:text-[#B0B3B8] w-12">{String(day).padStart(2,"0")}</td>
+                    <td className="td text-gray-500 dark:text-[#B0B3B8]">
                       {new Date(ds+"T00:00:00").toLocaleDateString("en-PH",{weekday:"short",month:"short",day:"numeric"})}
                       {isToday && <span className="ml-2 badge-green text-[10px]">Today</span>}
                     </td>
                     <td className="td font-mono text-emerald-600 dark:text-emerald-400">{profit > 0 ? `+₱${fmt(profit)}` : "—"}</td>
                     <td className="td font-mono text-red-500 dark:text-red-400">{expense > 0 ? `-₱${fmt(expense)}` : "—"}</td>
-                    <td className={`td font-mono ${net > 0 ? "text-emerald-600 dark:text-emerald-400" : net < 0 ? "text-red-500 dark:text-red-400" : "text-gray-400 dark:text-slate-500"}`}>
+                    <td className={`td font-mono ${net > 0 ? "text-emerald-600 dark:text-emerald-400" : net < 0 ? "text-red-500 dark:text-red-400" : "text-gray-400 dark:text-[#B0B3B8]"}`}>
                       {net !== 0 ? `${net>0?"+":""}₱${fmt(net)}` : "—"}
                     </td>
-                    <td className="td text-gray-400 dark:text-slate-500 max-w-[160px] truncate">{dayEntries.map(e=>e.notes).filter(Boolean).join(", ") || "—"}</td>
+                    <td className="td text-gray-400 dark:text-[#B0B3B8] max-w-[160px] truncate">{dayEntries.map(e=>e.notes).filter(Boolean).join(", ") || "—"}</td>
                   </tr>
                 );
               })}
-              <tr className="bg-gray-50 dark:bg-slate-900/50 border-t-2 border-gray-200 dark:border-slate-600">
-                <td colSpan={2} className="px-4 py-3 text-xs font-medium text-gray-700 dark:text-slate-300 uppercase tracking-wider">Total</td>
+              <tr className="bg-gray-50 dark:bg-[#18191A]/50 border-t-2 border-gray-200 dark:border-[#3E4042]">
+                <td colSpan={2} className="px-4 py-3 text-xs font-medium text-gray-700 dark:text-[#E4E6EB] uppercase tracking-wider">Total</td>
                 <td className="px-4 py-3 font-mono font-medium text-emerald-600 dark:text-emerald-400">+₱{fmt(totalProfit)}</td>
                 <td className="px-4 py-3 font-mono font-medium text-red-500 dark:text-red-400">-₱{fmt(totalExpense)}</td>
                 <td className={`px-4 py-3 font-mono font-medium ${netIncome >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"}`}>

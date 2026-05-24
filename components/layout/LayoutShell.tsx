@@ -8,7 +8,7 @@ export function LayoutShell({ children, user }: { children: React.ReactNode; use
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-200 dark:bg-slate-900">
+    <div className="min-h-screen bg-slate-200 dark:bg-[#18191A]">
       <Sidebar user={user} />
       <main className={`transition-all duration-300 min-h-screen
         md:${collapsed ? "ml-16" : "ml-60"}

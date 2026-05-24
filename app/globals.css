@@ -14,8 +14,8 @@
     color: #111827;
   }
   .dark body {
-    background-color: #0F172A;
-    color: #F1F5F9;
+    background-color: #18191A;
+    color: #E4E6EB;
   }
   html.dark { color-scheme: dark; }
 }
@@ -23,7 +23,7 @@
 @layer components {
   /* Cards */
   .card {
-    @apply bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl shadow-card;
+    @apply bg-white dark:bg-[#242526] border border-gray-200 dark:border-[#3E4042] rounded-2xl shadow-card;
   }
   .card-hover {
     @apply hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200;
@@ -34,13 +34,13 @@
     @apply inline-flex items-center justify-center gap-2 bg-gray-900 dark:bg-white hover:bg-gray-700 dark:hover:bg-gray-100 text-white dark:text-gray-900 font-medium rounded-xl px-4 py-2.5 text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 bg-white dark:bg-slate-700 hover:bg-gray-50 dark:hover:bg-slate-600 text-gray-700 dark:text-slate-200 font-medium rounded-xl px-4 py-2.5 text-sm border border-gray-200 dark:border-slate-600 transition-all duration-200;
+    @apply inline-flex items-center justify-center gap-2 bg-white dark:bg-[#3A3B3C] hover:bg-gray-50 dark:hover:bg-[#4A4B4C] text-gray-700 dark:text-[#E4E6EB] font-medium rounded-xl px-4 py-2.5 text-sm border border-gray-200 dark:border-[#3E4042] transition-all duration-200;
   }
   .btn-danger {
     @apply inline-flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-xl px-4 py-2.5 text-sm transition-all duration-200 disabled:opacity-50;
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-600 dark:text-slate-300 font-medium rounded-xl px-3 py-2 text-sm transition-all duration-200;
+    @apply inline-flex items-center justify-center gap-2 hover:bg-gray-100 dark:hover:bg-[#3A3B3C] text-gray-600 dark:text-[#E4E6EB] font-medium rounded-xl px-3 py-2 text-sm transition-all duration-200;
   }
   .btn-success {
     @apply inline-flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-xl px-4 py-2.5 text-sm transition-all duration-200 disabled:opacity-50;
@@ -48,10 +48,10 @@
 
   /* Inputs */
   .input-field {
-    @apply w-full bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/30 focus:border-transparent transition-all;
+    @apply w-full bg-white dark:bg-[#3A3B3C] border border-gray-200 dark:border-[#3E4042] rounded-xl px-3 py-2.5 text-sm text-gray-900 dark:text-[#E4E6EB] placeholder-gray-400 dark:placeholder-[#B0B3B8] focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-[#E4E6EB]/20 focus:border-transparent transition-all;
   }
   .select-field {
-    @apply w-full bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/30 focus:border-transparent transition-all;
+    @apply w-full bg-white dark:bg-[#3A3B3C] border border-gray-200 dark:border-[#3E4042] rounded-xl px-3 py-2.5 text-sm text-gray-900 dark:text-[#E4E6EB] focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-[#E4E6EB]/20 focus:border-transparent transition-all;
   }
 
   /* Badges */
@@ -71,35 +71,35 @@
     @apply badge bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400;
   }
   .badge-gray {
-    @apply badge bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300;
+    @apply badge bg-gray-100 dark:bg-[#3A3B3C] text-gray-600 dark:text-[#E4E6EB];
   }
 
   /* Page layout helpers */
   .page-title {
-    @apply text-2xl font-bold text-gray-900 dark:text-white tracking-tight;
+    @apply text-2xl font-bold text-gray-900 dark:text-[#E4E6EB] tracking-tight;
   }
   .page-subtitle {
-    @apply text-sm text-gray-500 dark:text-slate-400 mt-0.5;
+    @apply text-sm text-gray-500 dark:text-[#B0B3B8] mt-0.5;
   }
   .section-title {
-    @apply text-base font-semibold text-gray-900 dark:text-white;
+    @apply text-base font-semibold text-gray-900 dark:text-[#E4E6EB];
   }
   .label {
-    @apply block text-xs font-medium text-gray-600 dark:text-slate-400 mb-1.5;
+    @apply block text-xs font-medium text-gray-600 dark:text-[#B0B3B8] mb-1.5;
   }
 
   /* Table */
   .table-container {
-    @apply bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl shadow-card overflow-hidden;
+    @apply bg-white dark:bg-[#242526] border border-gray-200 dark:border-[#3E4042] rounded-2xl shadow-card overflow-hidden;
   }
   .th {
-    @apply bg-gray-50 dark:bg-slate-900/50 text-gray-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider px-4 py-3 text-left border-b border-gray-200 dark:border-slate-700;
+    @apply bg-gray-50 dark:bg-[#18191A] text-gray-500 dark:text-[#B0B3B8] text-xs font-semibold uppercase tracking-wider px-4 py-3 text-left border-b border-gray-200 dark:border-[#3E4042];
   }
   .td {
-    @apply px-4 py-3 text-sm text-gray-700 dark:text-slate-300;
+    @apply px-4 py-3 text-sm text-gray-700 dark:text-[#E4E6EB];
   }
   .tr-hover {
-    @apply border-b border-gray-100 dark:border-slate-700/50 hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors;
+    @apply border-b border-gray-100 dark:border-[#3E4042]/50 hover:bg-gray-50 dark:hover:bg-[#3A3B3C]/40 transition-colors;
   }
 
   /* Stat card */
@@ -113,8 +113,8 @@
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #D1D5DB; }
-.dark ::-webkit-scrollbar-thumb { background: #334155; }
-.dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
+.dark ::-webkit-scrollbar-thumb { background: #3A3B3C; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #4A4B4C; }
 
 /* Recharts tooltip */
 .recharts-tooltip-wrapper { z-index: 50; }

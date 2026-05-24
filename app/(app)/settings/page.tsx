@@ -75,14 +75,14 @@ export default function SettingsPage() {
               className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all mb-0.5 ${
                 panel === key
                   ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-sm"
-                  : "text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-gray-900 dark:hover:text-white"
+                  : "text-gray-600 dark:text-[#E4E6EB] hover:bg-gray-100 dark:hover:bg-[#3A3B3C] hover:text-gray-900 dark:hover:text-[#E4E6EB]"
               }`}>
               <Icon size={15} /> {label}
             </button>
           ))}
-          <div className="border-t border-gray-100 dark:border-slate-700 mt-2 pt-2">
+          <div className="border-t border-gray-100 dark:border-[#3E4042] mt-2 pt-2">
             <button onClick={() => signOut({ callbackUrl: "/auth/login" })}
-              className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-500 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
+              className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-500 dark:text-[#B0B3B8] hover:text-red-500 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-[#3A3B3C] transition-colors">
               <LogOut size={15} /> Sign Out
             </button>
           </div>
@@ -93,13 +93,13 @@ export default function SettingsPage() {
           {panel === "profile" && (
             <div className="card p-6 space-y-5">
               <h2 className="section-title">My Profile</h2>
-              <div className="flex items-center gap-4 pb-4 border-b border-gray-100 dark:border-slate-700">
+              <div className="flex items-center gap-4 pb-4 border-b border-gray-100 dark:border-[#3E4042]">
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-xl font-bold text-white flex-shrink-0">
                   {(session?.user?.name || "U")[0].toUpperCase()}
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-900 dark:text-white">{session?.user?.name}</div>
-                  <div className="text-sm text-gray-500 dark:text-slate-400">{session?.user?.email}</div>
+                  <div className="font-semibold text-gray-900 dark:text-[#E4E6EB]">{session?.user?.name}</div>
+                  <div className="text-sm text-gray-500 dark:text-[#B0B3B8]">{session?.user?.email}</div>
                 </div>
               </div>
 
@@ -113,7 +113,7 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div className="border-t border-gray-100 dark:border-slate-700 pt-5">
+              <div className="border-t border-gray-100 dark:border-[#3E4042] pt-5">
                 <h3 className="section-title mb-4">Change Password</h3>
                 <form onSubmit={handleChangePw} className="space-y-3">
                   {[
@@ -127,7 +127,7 @@ export default function SettingsPage() {
                         <input type={showPw ? "text" : "password"} value={f.value} onChange={e => f.set(e.target.value)} required className="input-field pr-10" />
                         {f.label === "Current Password" && (
                           <button type="button" onClick={() => setShowPw(v => !v)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition-colors">
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#B0B3B8] hover:text-gray-600 dark:hover:text-slate-300 transition-colors">
                             {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
                           </button>
                         )}
@@ -149,7 +149,7 @@ export default function SettingsPage() {
                 <AlertTriangle size={18} className="text-red-500" />
                 <h2 className="text-base font-semibold text-red-600 dark:text-red-400">Danger Zone</h2>
               </div>
-              <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">These actions are irreversible.</p>
+              <p className="text-sm text-gray-500 dark:text-[#B0B3B8] mb-5">These actions are irreversible.</p>
               <div className="space-y-3">
                 {[
                   { label: "Clear All Transactions", sub: "Delete all transaction history permanently" },
@@ -157,12 +157,12 @@ export default function SettingsPage() {
                   { label: "Delete All Accounts", sub: "Remove all GCash account records permanently" },
                   { label: "Full System Reset", sub: "Delete ALL data across the entire system" },
                 ].map(b => (
-                  <div key={b.label} className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-slate-700/50 last:border-0">
+                  <div key={b.label} className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-[#3E4042]/50 last:border-0">
                     <div className="flex items-start gap-2.5">
                       <AlertTriangle size={14} className="text-red-400 mt-0.5 flex-shrink-0" />
                       <div>
-                        <div className="text-sm font-medium text-gray-800 dark:text-slate-200">{b.label}</div>
-                        <div className="text-xs text-gray-500 dark:text-slate-400">{b.sub}</div>
+                        <div className="text-sm font-medium text-gray-800 dark:text-[#E4E6EB]">{b.label}</div>
+                        <div className="text-xs text-gray-500 dark:text-[#B0B3B8]">{b.sub}</div>
                       </div>
                     </div>
                     <button

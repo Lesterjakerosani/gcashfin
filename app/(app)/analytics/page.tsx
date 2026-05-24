@@ -8,13 +8,13 @@ function StatCard({ label, value, sub, icon: Icon, iconColor }: { label: string;
   return (
     <div className="stat-card">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">{label}</span>
+        <span className="text-xs font-medium text-gray-500 dark:text-[#B0B3B8] uppercase tracking-wider">{label}</span>
         <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${iconColor}`}>
           <Icon size={15} />
         </div>
       </div>
-      <div className="text-2xl font-medium text-gray-900 dark:text-white">{value}</div>
-      {sub && <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">{sub}</div>}
+      <div className="text-2xl font-medium text-gray-900 dark:text-[#E4E6EB]">{value}</div>
+      {sub && <div className="text-xs text-gray-500 dark:text-[#B0B3B8] mt-1">{sub}</div>}
     </div>
   );
 }
@@ -22,8 +22,8 @@ function StatCard({ label, value, sub, icon: Icon, iconColor }: { label: string;
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload?.length) {
     return (
-      <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-card-hover px-3 py-2 text-xs">
-        <div className="text-gray-500 dark:text-slate-400 mb-1">{label}</div>
+      <div className="bg-white dark:bg-[#242526] border border-gray-200 dark:border-[#3E4042] rounded-xl shadow-card-hover px-3 py-2 text-xs">
+        <div className="text-gray-500 dark:text-[#B0B3B8] mb-1">{label}</div>
         <div className="text-emerald-600 dark:text-emerald-400 font-mono">₱{fmt(payload[0].value)}</div>
       </div>
     );
@@ -55,9 +55,9 @@ export default function AnalyticsPage() {
         {/* Trend Chart */}
         <div className="card p-5">
           <h2 className="section-title mb-0.5">Profit Trend</h2>
-          <p className="text-xs text-gray-500 dark:text-slate-400 mb-4">Last 30 days — daily profit</p>
+          <p className="text-xs text-gray-500 dark:text-[#B0B3B8] mb-4">Last 30 days — daily profit</p>
           {!data?.trend?.some((d: any) => d.v > 0) ? (
-            <div className="h-40 flex items-center justify-center text-gray-400 dark:text-slate-500 text-sm">No data yet</div>
+            <div className="h-40 flex items-center justify-center text-gray-400 dark:text-[#B0B3B8] text-sm">No data yet</div>
           ) : (
             <ResponsiveContainer width="100%" height={180}>
               <AreaChart data={data.trend} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
@@ -80,9 +80,9 @@ export default function AnalyticsPage() {
         {/* Monthly Bar Chart */}
         <div className="card p-5">
           <h2 className="section-title mb-0.5">Monthly Earnings</h2>
-          <p className="text-xs text-gray-500 dark:text-slate-400 mb-4">Last 6 months — total earnings</p>
+          <p className="text-xs text-gray-500 dark:text-[#B0B3B8] mb-4">Last 6 months — total earnings</p>
           {!data?.monthly?.some((d: any) => d.v > 0) ? (
-            <div className="h-40 flex items-center justify-center text-gray-400 dark:text-slate-500 text-sm">No data yet</div>
+            <div className="h-40 flex items-center justify-center text-gray-400 dark:text-[#B0B3B8] text-sm">No data yet</div>
           ) : (
             <ResponsiveContainer width="100%" height={180}>
               <BarChart data={data.monthly} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
@@ -101,18 +101,18 @@ export default function AnalyticsPage() {
         {/* Top Accounts */}
         <div className="card p-5">
           <h2 className="section-title mb-0.5">Top Accounts</h2>
-          <p className="text-xs text-gray-500 dark:text-slate-400 mb-4">Ranked by balance usage</p>
+          <p className="text-xs text-gray-500 dark:text-[#B0B3B8] mb-4">Ranked by balance usage</p>
           {!data?.topAccounts?.length ? (
-            <div className="text-center py-8 text-gray-400 dark:text-slate-500 text-sm">No accounts yet.</div>
+            <div className="text-center py-8 text-gray-400 dark:text-[#B0B3B8] text-sm">No accounts yet.</div>
           ) : data.topAccounts.map((a: any, i: number) => (
-            <div key={a.id} className="flex items-center gap-3 py-3 border-b border-gray-100 dark:border-slate-700/50 last:border-0">
+            <div key={a.id} className="flex items-center gap-3 py-3 border-b border-gray-100 dark:border-[#3E4042]/50 last:border-0">
               <div className="text-2xl font-bold text-gray-200 dark:text-slate-700 w-7 flex-shrink-0 text-center">{i+1}</div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5 text-sm font-medium text-gray-800 dark:text-slate-200">
+                <div className="flex items-center gap-1.5 text-sm font-medium text-gray-800 dark:text-[#E4E6EB]">
                   <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: a.color }} />
                   <span className="truncate">{a.model}</span>
                 </div>
-                <div className="text-xs text-gray-400 dark:text-slate-500">{a.phone} · {a.category}</div>
+                <div className="text-xs text-gray-400 dark:text-[#B0B3B8]">{a.phone} · {a.category}</div>
               </div>
               <div className="font-mono text-sm text-emerald-600 dark:text-emerald-400 flex-shrink-0">₱{fmt(a.used)}</div>
             </div>
@@ -122,9 +122,9 @@ export default function AnalyticsPage() {
         {/* Account Usage Bar Chart */}
         <div className="card p-5">
           <h2 className="section-title mb-0.5">Account Usage</h2>
-          <p className="text-xs text-gray-500 dark:text-slate-400 mb-4">Balance utilization per account</p>
+          <p className="text-xs text-gray-500 dark:text-[#B0B3B8] mb-4">Balance utilization per account</p>
           {!data?.usageData?.length ? (
-            <div className="h-40 flex items-center justify-center text-gray-400 dark:text-slate-500 text-sm">No data yet</div>
+            <div className="h-40 flex items-center justify-center text-gray-400 dark:text-[#B0B3B8] text-sm">No data yet</div>
           ) : (
             <ResponsiveContainer width="100%" height={180}>
               <BarChart data={data.usageData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>

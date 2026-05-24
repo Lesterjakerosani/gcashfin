@@ -194,9 +194,9 @@ export default function NotesPage() {
   }[saveStatus];
 
   const statusColor = {
-    saving: "text-gray-400 dark:text-slate-500",
+    saving: "text-gray-400 dark:text-[#B0B3B8]",
     saved: "text-emerald-600 dark:text-emerald-400",
-    unsaved: "text-gray-400 dark:text-slate-500",
+    unsaved: "text-gray-400 dark:text-[#B0B3B8]",
     error: "text-red-500",
   }[saveStatus];
 
@@ -204,8 +204,8 @@ export default function NotesPage() {
     return (
       <div className="flex items-center justify-center min-h-[40vh]">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-gray-200 dark:border-slate-700 border-t-gray-900 dark:border-t-white rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-gray-500 dark:text-slate-400">Loading notes...</p>
+          <div className="w-8 h-8 border-2 border-gray-200 dark:border-[#3E4042] border-t-gray-900 dark:border-t-white rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-gray-500 dark:text-[#B0B3B8]">Loading notes...</p>
         </div>
       </div>
     );
@@ -216,7 +216,7 @@ export default function NotesPage() {
       <div className="flex items-center justify-center min-h-[40vh]">
         <div className="card p-6 max-w-md text-center">
           <p className="text-red-500 font-medium mb-2">Error loading notes</p>
-          <p className="text-sm text-gray-500 dark:text-slate-400">
+          <p className="text-sm text-gray-500 dark:text-[#B0B3B8]">
             {fetchError instanceof Error ? fetchError.message : "Unknown error"}
           </p>
         </div>
@@ -233,14 +233,14 @@ export default function NotesPage() {
 
       <div className="card p-6">
         <div className="flex items-center gap-3 mb-4 flex-wrap">
-          <FileText size={18} className="text-gray-400 dark:text-slate-500" />
+          <FileText size={18} className="text-gray-400 dark:text-[#B0B3B8]" />
           <span className="section-title">My Notes</span>
 
           <div className={`flex items-center gap-1.5 ml-2 transition-opacity duration-500 ${statusVisible ? "opacity-100" : "opacity-0"}`}>
             {saveStatus === "error" ? (
               <CloudOff size={13} className="text-red-500" />
             ) : (
-              <Cloud size={13} className={saveStatus === "saving" ? "text-gray-400 dark:text-slate-500 animate-pulse" : "text-emerald-500 dark:text-emerald-400"} />
+              <Cloud size={13} className={saveStatus === "saving" ? "text-gray-400 dark:text-[#B0B3B8] animate-pulse" : "text-emerald-500 dark:text-emerald-400"} />
             )}
             <span className={`text-xs ${statusColor}`}>{statusLabel}</span>
           </div>
@@ -264,10 +264,10 @@ export default function NotesPage() {
             showStatus("unsaved");
           }}
           placeholder="Start writing your notes here..."
-          className="w-full h-[520px] bg-gray-50 dark:bg-slate-700/30 border border-gray-200 dark:border-slate-600 rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gray-900/10 dark:focus:ring-white/10 focus:border-gray-300 dark:focus:border-slate-500 resize-none transition-all leading-relaxed font-mono"
+          className="w-full h-[520px] bg-gray-50 dark:bg-[#3A3B3C]/30 border border-gray-200 dark:border-[#3E4042] rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-[#E4E6EB] placeholder-gray-400 dark:placeholder-[#B0B3B8] focus:outline-none focus:ring-2 focus:ring-gray-900/10 dark:focus:ring-white/10 focus:border-gray-300 dark:focus:border-slate-500 resize-none transition-all leading-relaxed font-mono"
         />
       </div>
-      <p className="text-xs text-gray-400 dark:text-slate-500 text-right">Ctrl+S to save manually</p>
+      <p className="text-xs text-gray-400 dark:text-[#B0B3B8] text-right">Ctrl+S to save manually</p>
     </div>
   );
 }

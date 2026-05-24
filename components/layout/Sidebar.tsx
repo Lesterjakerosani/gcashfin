@@ -53,13 +53,13 @@ export function Sidebar({ user }: { user: User }) {
   const SidebarContent = ({ isMobile = false }: { isMobile?: boolean }) => (
     <div className={`flex flex-col h-full ${isMobile ? "" : ""}`}>
       {/* Logo */}
-      <div className="flex items-center justify-between px-4 py-4 border-b border-gray-100 dark:border-slate-700">
+      <div className="flex items-center justify-between px-4 py-4 border-b border-gray-100 dark:border-[#3E4042]">
         {(!collapsed || isMobile) && (
           <Link href="/dashboard" className="flex items-center gap-2.5">
             <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
               <TrendingUp size={16} className="text-white" />
             </div>
-            <span className="font-bold text-gray-900 dark:text-white text-[15px] tracking-tight">GCashFin</span>
+            <span className="font-bold text-gray-900 dark:text-[#E4E6EB] text-[15px] tracking-tight">GCashFin</span>
           </Link>
         )}
         {collapsed && !isMobile && (
@@ -68,11 +68,11 @@ export function Sidebar({ user }: { user: User }) {
           </div>
         )}
         {isMobile ? (
-          <button onClick={() => setMobileOpen(false)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-400 transition-colors">
+          <button onClick={() => setMobileOpen(false)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#3A3B3C] text-gray-400 transition-colors">
             <X size={16} />
           </button>
         ) : (
-          <button onClick={() => setCollapsed(c => !c)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-400 dark:text-slate-400 transition-colors flex-shrink-0">
+          <button onClick={() => setCollapsed(c => !c)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#3A3B3C] text-gray-400 dark:text-[#B0B3B8] transition-colors flex-shrink-0">
             {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
           </button>
         )}
@@ -88,7 +88,7 @@ export function Sidebar({ user }: { user: User }) {
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 group
                 ${active
                   ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-sm"
-                  : "text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-gray-900 dark:hover:text-white"
+                  : "text-gray-600 dark:text-[#E4E6EB] hover:bg-gray-100 dark:hover:bg-[#3A3B3C] hover:text-gray-900 dark:hover:text-[#E4E6EB]"
                 }
                 ${collapsed && !isMobile ? "justify-center px-2" : ""}`}
             >
@@ -100,10 +100,10 @@ export function Sidebar({ user }: { user: User }) {
       </nav>
 
       {/* Bottom */}
-      <div className="px-2 py-3 border-t border-gray-100 dark:border-slate-700 space-y-0.5">
+      <div className="px-2 py-3 border-t border-gray-100 dark:border-[#3E4042] space-y-0.5">
         <button onClick={toggleDark}
           title={collapsed && !isMobile ? (dark ? "Light Mode" : "Dark Mode") : undefined}
-          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-gray-900 dark:hover:text-white transition-colors ${collapsed && !isMobile ? "justify-center px-2" : ""}`}>
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-600 dark:text-[#E4E6EB] hover:bg-gray-100 dark:hover:bg-[#3A3B3C] hover:text-gray-900 dark:hover:text-[#E4E6EB] transition-colors ${collapsed && !isMobile ? "justify-center px-2" : ""}`}>
           {dark ? <Sun size={16} className="flex-shrink-0" /> : <Moon size={16} className="flex-shrink-0" />}
           {(!collapsed || isMobile) && <span>{dark ? "Light Mode" : "Dark Mode"}</span>}
         </button>
@@ -115,19 +115,19 @@ export function Sidebar({ user }: { user: User }) {
                 {user?.name?.[0]?.toUpperCase() || "U"}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-semibold text-gray-900 dark:text-white truncate">{user?.name || "User"}</div>
-                <div className="text-[10px] text-gray-400 dark:text-slate-400 truncate">{user?.email}</div>
+                <div className="text-xs font-semibold text-gray-900 dark:text-[#E4E6EB] truncate">{user?.name || "User"}</div>
+                <div className="text-[10px] text-gray-400 dark:text-[#B0B3B8] truncate">{user?.email}</div>
               </div>
             </div>
             <button onClick={() => signOut({ callbackUrl: "/auth/login" })}
-              className="w-full flex items-center gap-2 text-xs text-gray-500 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors py-1">
+              className="w-full flex items-center gap-2 text-xs text-gray-500 dark:text-[#B0B3B8] hover:text-red-500 dark:hover:text-red-400 transition-colors py-1">
               <LogOut size={12} /> Sign out
             </button>
           </div>
         ) : (
           <button onClick={() => signOut({ callbackUrl: "/auth/login" })}
             title="Sign out"
-            className="w-full flex items-center justify-center px-2 py-2.5 rounded-xl text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
+            className="w-full flex items-center justify-center px-2 py-2.5 rounded-xl text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-[#3A3B3C] transition-colors">
             <LogOut size={16} />
           </button>
         )}
@@ -138,14 +138,14 @@ export function Sidebar({ user }: { user: User }) {
   return (
     <>
       {/* Mobile top bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-4 py-3 flex items-center justify-between">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white dark:bg-[#242526] border-b border-gray-200 dark:border-[#3E4042] px-4 py-3 flex items-center justify-between">
         <Link href="/dashboard" className="flex items-center gap-2">
           <div className="w-7 h-7 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-lg flex items-center justify-center">
             <TrendingUp size={14} className="text-white" />
           </div>
-          <span className="font-bold text-gray-900 dark:text-white text-sm">GCashFin</span>
+          <span className="font-bold text-gray-900 dark:text-[#E4E6EB] text-sm">GCashFin</span>
         </Link>
-        <button onClick={() => setMobileOpen(true)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-600 dark:text-slate-300 transition-colors">
+        <button onClick={() => setMobileOpen(true)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#3A3B3C] text-gray-600 dark:text-[#E4E6EB] transition-colors">
           <Menu size={18} />
         </button>
       </div>
@@ -154,14 +154,14 @@ export function Sidebar({ user }: { user: User }) {
       {mobileOpen && (
         <div className="md:hidden fixed inset-0 z-50 flex">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <div className="relative w-64 bg-white dark:bg-slate-800 h-full shadow-xl animate-slide-in">
+          <div className="relative w-64 bg-white dark:bg-[#242526] h-full shadow-xl animate-slide-in">
             <SidebarContent isMobile />
           </div>
         </div>
       )}
 
       {/* Desktop sidebar */}
-      <aside className={`hidden md:flex flex-col fixed left-0 top-0 h-screen bg-white dark:bg-slate-800 border-r border-gray-100 dark:border-slate-700 z-30 transition-all duration-300 ${collapsed ? "w-16" : "w-60"}`}>
+      <aside className={`hidden md:flex flex-col fixed left-0 top-0 h-screen bg-white dark:bg-[#242526] border-r border-gray-100 dark:border-[#3E4042] z-30 transition-all duration-300 ${collapsed ? "w-16" : "w-60"}`}>
         <SidebarContent />
       </aside>
     </>
