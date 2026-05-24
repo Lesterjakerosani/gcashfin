@@ -13,7 +13,7 @@ const EXPENSE_CATS = ["Withdrawal","Load Cost","Fees","General","Other"];
 function entryNet(e: Entry) { return e.type === "expense" ? -e.amount : e.amount; }
 
 function getPHDate() {
-  return new Intl.DateTimeFormat('en-PH', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()).split('/').reverse().join('-');
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 }
 
 export default function SalaryPage() {
