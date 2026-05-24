@@ -145,7 +145,7 @@ export default function ReportsPage() {
           </td>
           <td className="td text-right pr-5 w-36">
             <div className={`font-mono text-sm tabular-nums ${
-              dateObj.profit > 0 ? "text-emerald-600 dark:text-emerald-400 font-semibold" : "text-gray-300 dark:text-slate-600"
+              dateObj.profit > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-gray-300 dark:text-slate-600"
             }`}>
               {dateObj.profit > 0 ? `+₱${fmt(dateObj.profit)}` : "—"}
             </div>
