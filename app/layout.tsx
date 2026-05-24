@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           __html: `try{if(localStorage.getItem('gcashfin-theme')==='dark'){document.documentElement.classList.add('dark')}}catch{}`
         }} />
       </head>
-      <body className={`${dmMono.variable} bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-slate-100 antialiased`}>
+      <body className={`${dmMono.variable} bg-slate-200 dark:bg-slate-900 text-gray-900 dark:text-slate-100 antialiased`}>
         <Providers>{children}</Providers>
       </body>
     </html>
