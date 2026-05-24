@@ -141,7 +141,7 @@ export default function NotesPage() {
 
     saveTimer.current = setTimeout(() => {
       saveMut.mutate({ content, quiet: true });
-    }, 100);
+    }, 1300);
 
     return () => {
       if (saveTimer.current) clearTimeout(saveTimer.current);
