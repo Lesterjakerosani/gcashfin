@@ -60,7 +60,7 @@ export default function SalaryPage() {
   function handleAdd(e: React.FormEvent) {
     e.preventDefault();
     if (!form.amount || parseFloat(form.amount) <= 0) { toast.error("Enter a valid amount."); return; }
-    addMut.mutate({ date: form.date, type: form.type, amount: parseFloat(form.amount), category: form.category, notes: form.notes });
+    addMut.mutate({ date: currentPHDate, type: form.type, amount: parseFloat(form.amount), category: form.category, notes: form.notes });
   }
 
   const totalProfit = entries.filter(e => e.type === "profit").reduce((s, e) => s + e.amount, 0);
@@ -129,9 +129,10 @@ export default function SalaryPage() {
         <div className="bg-[rgba(15,15,15,0.92)] border border-white/[0.07] rounded-lg p-5">
           <div className="font-display text-lg tracking-[2px] text-white mb-4">ADD <span className="text-[#e74c3c]">ENTRY</span></div>
           <form onSubmit={handleAdd} className="space-y-3">
-            <div>
-              <label className="block text-[10px] uppercase tracking-widest text-[#888] mb-1">Date</label>
-              <input type="date" value={form.date} onChange={e => setForm(f=>({...f,date:e.target.value}))} className="w-full bg-white/[0.04] border border-white/[0.07] rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-red-700" />
+            <div className="flex items-center gap-2 px-3 py-2 bg-white/[0.04] border border-white/[0.07] rounded text-xs text-[#888]">
+              <span className="uppercase tracking-widest">Date:</span>
+              <span className="text-white font-mono">{currentPHDate}</span>
+              <span className="ml-auto text-[10px] text-[#555]">auto</span>
             </div>
             <div>
               <label className="block text-[10px] uppercase tracking-widest text-[#888] mb-1">Type</label>
