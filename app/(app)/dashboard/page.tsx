@@ -25,7 +25,7 @@ function StatCard({ label, value, sub, color = "gray" }: { label: string; value:
   return (
     <div className="stat-card">
       <p className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">{label}</p>
-      <p className={`text-2xl font-bold ${colors[color]} leading-none`}>{value}</p>
+      <p className={`text-2xl font-medium ${colors[color]} leading-none`}>{value}</p>
       {sub && <p className="text-xs text-gray-400 dark:text-slate-500 mt-1.5">{sub}</p>}
     </div>
   );
@@ -201,9 +201,9 @@ export default function DashboardPage() {
                       </td>
                       <td className="td font-mono text-xs text-gray-500 dark:text-slate-400">{a.phone}</td>
                       <td className="td"><span className="badge-gray">{a.category}</span></td>
-                      <td className="td font-mono font-semibold text-emerald-600 dark:text-emerald-400">₱{fmt(a.used)}</td>
+                      <td className="td font-mono text-emerald-600 dark:text-emerald-400">₱{fmt(a.used)}</td>
                       <td className="td font-mono text-gray-500 dark:text-slate-400">₱{fmt(a.limit)}</td>
-                      <td className="td font-mono font-semibold text-gray-900 dark:text-white">₱{fmt(avail)}</td>
+                      <td className="td font-mono text-gray-900 dark:text-white">₱{fmt(avail)}</td>
                       <td className="td"><UsageBar pct={pct} /></td>
                       <td className="td"><span className={st.cls}>{st.label}</span></td>
                       <td className="td">
@@ -274,10 +274,10 @@ export default function DashboardPage() {
                       <td className="td font-mono text-xs">{t.phone}</td>
                       <td className="td font-medium text-gray-900 dark:text-white">{t.account}</td>
                       <td className="td text-gray-500 dark:text-slate-400">{t.category}</td>
-                      <td className={`td font-mono font-semibold ${t.type === "Add" ? "text-emerald-600 dark:text-emerald-400" : t.type === "Deduct" ? "text-red-500 dark:text-red-400" : "text-gray-500"}`}>
+                      <td className={`td font-mono ${t.type === "Add" ? "text-emerald-600 dark:text-emerald-400" : t.type === "Deduct" ? "text-red-500 dark:text-red-400" : "text-gray-500"}`}>
                         {t.type === "Add" ? "+" : t.type === "Deduct" ? "-" : ""}₱{fmt(t.amount)}
                       </td>
-                      <td className="td font-mono font-semibold text-gray-900 dark:text-white">₱{fmt(t.balAfter)}</td>
+                      <td className="td font-mono text-gray-900 dark:text-white">₱{fmt(t.balAfter)}</td>
                       <td className="td text-xs text-gray-400 dark:text-slate-500">{t.notes || "—"}</td>
                       <td className="td"><span className="badge-green">Completed</span></td>
                     </tr>

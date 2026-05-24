@@ -111,7 +111,7 @@ export default function ReportsPage() {
               <BarChart2 size={15} className="text-emerald-600 dark:text-emerald-400" />
             </div>
           </div>
-          <div className="text-2xl font-bold text-gray-900 dark:text-white">
+          <div className="text-2xl font-medium text-gray-900 dark:text-white">
             ₱{fmt(selectedMonth === "all" ? totalYearProfit : selectedMonthProfit)}
           </div>
         </div>
@@ -122,7 +122,7 @@ export default function ReportsPage() {
               <BarChart2 size={15} className="text-blue-600 dark:text-blue-400" />
             </div>
           </div>
-          <div className="text-2xl font-bold text-gray-900 dark:text-white">₱{fmt(totalYearProfit)}</div>
+          <div className="text-2xl font-medium text-gray-900 dark:text-white">₱{fmt(totalYearProfit)}</div>
         </div>
       </div>
 
@@ -173,7 +173,7 @@ export default function ReportsPage() {
                   </div>
 
                   <div className="w-24 flex-shrink-0 text-right">
-                    <div className={`text-sm font-semibold font-mono ${
+                    <div className={`text-sm font-mono ${
                       dateObj.profit > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-gray-300 dark:text-slate-600"
                     }`}>
                       ₱{fmt(dateObj.profit)}

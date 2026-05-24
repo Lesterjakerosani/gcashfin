@@ -13,7 +13,7 @@ function StatCard({ label, value, sub, icon: Icon, iconColor }: { label: string;
           <Icon size={15} />
         </div>
       </div>
-      <div className="text-2xl font-bold text-gray-900 dark:text-white">{value}</div>
+      <div className="text-2xl font-medium text-gray-900 dark:text-white">{value}</div>
       {sub && <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">{sub}</div>}
     </div>
   );
@@ -24,7 +24,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return (
       <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-card-hover px-3 py-2 text-xs">
         <div className="text-gray-500 dark:text-slate-400 mb-1">{label}</div>
-        <div className="text-emerald-600 dark:text-emerald-400 font-mono font-semibold">₱{fmt(payload[0].value)}</div>
+        <div className="text-emerald-600 dark:text-emerald-400 font-mono">₱{fmt(payload[0].value)}</div>
       </div>
     );
   }
@@ -114,7 +114,7 @@ export default function AnalyticsPage() {
                 </div>
                 <div className="text-xs text-gray-400 dark:text-slate-500">{a.phone} · {a.category}</div>
               </div>
-              <div className="font-mono text-sm font-semibold text-emerald-600 dark:text-emerald-400 flex-shrink-0">₱{fmt(a.used)}</div>
+              <div className="font-mono text-sm text-emerald-600 dark:text-emerald-400 flex-shrink-0">₱{fmt(a.used)}</div>
             </div>
           ))}
         </div>

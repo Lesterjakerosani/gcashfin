@@ -102,7 +102,7 @@ export default function SalaryPage() {
               <TrendingUp size={15} className="text-emerald-600 dark:text-emerald-400" />
             </div>
           </div>
-          <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">₱{fmt(totalProfit)}</div>
+          <div className="text-2xl font-medium text-emerald-600 dark:text-emerald-400">₱{fmt(totalProfit)}</div>
         </div>
         <div className="stat-card">
           <div className="flex items-center justify-between mb-3">
@@ -111,7 +111,7 @@ export default function SalaryPage() {
               <TrendingDown size={15} className="text-red-500 dark:text-red-400" />
             </div>
           </div>
-          <div className="text-2xl font-bold text-red-500 dark:text-red-400">₱{fmt(totalExpense)}</div>
+          <div className="text-2xl font-medium text-red-500 dark:text-red-400">₱{fmt(totalExpense)}</div>
         </div>
         <div className="stat-card">
           <div className="flex items-center justify-between mb-3">
@@ -120,7 +120,7 @@ export default function SalaryPage() {
               <DollarSign size={15} className={netIncome >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"} />
             </div>
           </div>
-          <div className={`text-2xl font-bold ${netIncome >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"}`}>
+          <div className={`text-2xl font-medium ${netIncome >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"}`}>
             {netIncome >= 0 ? "+" : ""}₱{fmt(netIncome)}
           </div>
         </div>
@@ -194,7 +194,7 @@ export default function SalaryPage() {
                       <span className={`text-xs font-medium ${e.type === "profit" ? "badge-green" : "badge-red"}`}>{e.category}</span>
                       <div className="text-xs text-gray-400 dark:text-slate-500 mt-0.5 truncate">{e.notes || "No notes"}</div>
                     </div>
-                    <div className={`font-mono text-sm font-semibold flex-shrink-0 ${e.type === "profit" ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"}`}>
+                    <div className={`font-mono text-sm flex-shrink-0 ${e.type === "profit" ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"}`}>
                       {e.type === "profit" ? "+" : "-"}₱{fmt(e.amount)}
                     </div>
                     <button onClick={() => { if(confirm("Delete this entry?")) delMut.mutate(e.id); }} className="text-gray-300 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 transition-colors flex-shrink-0 ml-1">
@@ -230,14 +230,14 @@ export default function SalaryPage() {
                 const isToday = ds === new Date().toISOString().slice(0,10);
                 return (
                   <tr key={ds} className={`tr-hover ${isToday ? "bg-emerald-50/50 dark:bg-emerald-900/10" : ""}`}>
-                    <td className="td font-bold text-gray-400 dark:text-slate-500 w-12">{String(day).padStart(2,"0")}</td>
+                    <td className="td text-gray-400 dark:text-slate-500 w-12">{String(day).padStart(2,"0")}</td>
                     <td className="td text-gray-500 dark:text-slate-400">
                       {new Date(ds+"T00:00:00").toLocaleDateString("en-PH",{weekday:"short",month:"short",day:"numeric"})}
                       {isToday && <span className="ml-2 badge-green text-[10px]">Today</span>}
                     </td>
-                    <td className="td font-mono font-semibold text-emerald-600 dark:text-emerald-400">{profit > 0 ? `+₱${fmt(profit)}` : "—"}</td>
-                    <td className="td font-mono font-semibold text-red-500 dark:text-red-400">{expense > 0 ? `-₱${fmt(expense)}` : "—"}</td>
-                    <td className={`td font-mono font-semibold ${net > 0 ? "text-emerald-600 dark:text-emerald-400" : net < 0 ? "text-red-500 dark:text-red-400" : "text-gray-400 dark:text-slate-500"}`}>
+                    <td className="td font-mono text-emerald-600 dark:text-emerald-400">{profit > 0 ? `+₱${fmt(profit)}` : "—"}</td>
+                    <td className="td font-mono text-red-500 dark:text-red-400">{expense > 0 ? `-₱${fmt(expense)}` : "—"}</td>
+                    <td className={`td font-mono ${net > 0 ? "text-emerald-600 dark:text-emerald-400" : net < 0 ? "text-red-500 dark:text-red-400" : "text-gray-400 dark:text-slate-500"}`}>
                       {net !== 0 ? `${net>0?"+":""}₱${fmt(net)}` : "—"}
                     </td>
                     <td className="td text-gray-400 dark:text-slate-500 max-w-[160px] truncate">{dayEntries.map(e=>e.notes).filter(Boolean).join(", ") || "—"}</td>
@@ -245,10 +245,10 @@ export default function SalaryPage() {
                 );
               })}
               <tr className="bg-gray-50 dark:bg-slate-900/50 border-t-2 border-gray-200 dark:border-slate-600">
-                <td colSpan={2} className="px-4 py-3 text-xs font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wider">Total</td>
-                <td className="px-4 py-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">+₱{fmt(totalProfit)}</td>
-                <td className="px-4 py-3 font-mono font-bold text-red-500 dark:text-red-400">-₱{fmt(totalExpense)}</td>
-                <td className={`px-4 py-3 font-mono font-bold ${netIncome >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"}`}>
+                <td colSpan={2} className="px-4 py-3 text-xs font-medium text-gray-700 dark:text-slate-300 uppercase tracking-wider">Total</td>
+                <td className="px-4 py-3 font-mono font-medium text-emerald-600 dark:text-emerald-400">+₱{fmt(totalProfit)}</td>
+                <td className="px-4 py-3 font-mono font-medium text-red-500 dark:text-red-400">-₱{fmt(totalExpense)}</td>
+                <td className={`px-4 py-3 font-mono font-medium ${netIncome >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"}`}>
                   {netIncome >= 0 ? "+" : ""}₱{fmt(netIncome)}
                 </td>
                 <td className="px-4 py-3" />
