@@ -29,95 +29,37 @@ export default function NotesPage() {
   const { data: noteData, isLoading, error: fetchError } = useQuery<NoteResponse>({
     queryKey: ["notes"],
     queryFn: async () => {
-      try {
-        console.log("[Notes Page] Fetching notes...");
-        const res = await fetch("/api/notes", {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        });
+      const res = await fetch("/api/notes", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
 
-        if (!res.ok) {
-          const errorData = await res.json();
-          console.error("[Notes Page] Fetch failed:", errorData);
-          const errorMessage = errorData.details ? `${errorData.error}: ${errorData.details}` : (errorData.error || `HTTP ${res.status}`);
-          throw new Error(errorMessage);
-        }
-
-        const data = await res.json();
-        console.log("[Notes Page] Fetch successful", data);
-        return data;
-      } catch (err) {
-        console.error("[Notes Page] Fetch error:", err);
-        throw err;
+      if (!res.ok) {
+        const errorData = await res.json();
+        const errorMessage = errorData.details ? `${errorData.error}: ${errorData.details}` : (errorData.error || `HTTP ${res.status}`);
+        throw new Error(errorMessage);
       }
+
+      return res.json();
     },
     retry: 2,
     retryDelay: 500,
   });
 
-  useEffect(() => {
-    if (noteData?.success) {
-      setContent(noteData.content || "");
-      setNoteId(noteData.id || null);
-      setHasUnsavedChanges(false);
-      setSaveStatus("All changes saved");
-    }
-  }, [noteData]);
-
-  useEffect(() => {
-    if (!hasUnsavedChanges || saveMut.isPending) return;
-    if (!content.trim() && !noteId) return;
-
-    if (saveTimer.current) {
-      clearTimeout(saveTimer.current);
-    }
-
-    saveTimer.current = setTimeout(() => {
-      saveMut.mutate({ content, quiet: true });
-    }, 1200);
-
-    return () => {
-      if (saveTimer.current) {
-        clearTimeout(saveTimer.current);
-      }
-    };
-  }, [content, hasUnsavedChanges, noteId, saveMut]);
-
-  useEffect(() => {
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) {
-        event.preventDefault();
-        event.returnValue = "You have unsaved changes.";
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [hasUnsavedChanges]);
-
   const saveMut = useMutation<NoteResponse, Error, SavePayload>({
     mutationFn: async ({ content: contentToSave }) => {
-      try {
-        console.log("[Notes Page] Saving notes...");
-        const res = await fetch("/api/notes", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ content: contentToSave }),
-        });
+      const res = await fetch("/api/notes", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: contentToSave }),
+      });
 
-        if (!res.ok) {
-          const errorData = await res.json();
-          console.error("[Notes Page] Save failed:", errorData);
-          throw new Error(errorData.details || errorData.error || `HTTP ${res.status}`);
-        }
-
-        const data: NoteResponse = await res.json();
-        console.log("[Notes Page] Save successful");
-        return data;
-      } catch (err) {
-        console.error("[Notes Page] Save error:", err);
-        throw err;
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.details || errorData.error || `HTTP ${res.status}`);
       }
+
+      return res.json();
     },
     onSuccess: (data, variables) => {
       if (data.note?.id) setNoteId(data.note.id);
@@ -133,7 +75,6 @@ export default function NotesPage() {
     },
     onError: (error, variables) => {
       const message = error instanceof Error ? error.message : "Failed to save notes";
-      console.error("[Notes Page] Mutation error:", message);
       if (!variables?.quiet) {
         toast.error(message);
       }
@@ -143,25 +84,17 @@ export default function NotesPage() {
 
   const deleteMut = useMutation({
     mutationFn: async () => {
-      try {
-        console.log("[Notes Page] Deleting notes...");
-        const res = await fetch("/api/notes", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-        });
+      const res = await fetch("/api/notes", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      });
 
-        if (!res.ok) {
-          const errorData = await res.json();
-          console.error("[Notes Page] Delete failed:", errorData);
-          throw new Error(errorData.error || `HTTP ${res.status}`);
-        }
-
-        console.log("[Notes Page] Delete successful");
-        return await res.json();
-      } catch (err) {
-        console.error("[Notes Page] Delete error:", err);
-        throw err;
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || `HTTP ${res.status}`);
       }
+
+      return res.json();
     },
     onSuccess: () => {
       setContent("");
@@ -171,7 +104,6 @@ export default function NotesPage() {
     },
     onError: (error) => {
       const message = error instanceof Error ? error.message : "Failed to delete notes";
-      console.error("[Notes Page] Delete error:", message);
       toast.error(message);
     },
   });
@@ -197,6 +129,64 @@ export default function NotesPage() {
       deleteMut.mutate();
     }
   }, [deleteMut]);
+
+  useEffect(() => {
+    if (noteData?.success) {
+      setContent(noteData.content || "");
+      setNoteId(noteData.id || null);
+      setHasUnsavedChanges(false);
+      setSaveStatus("All changes saved");
+    }
+  }, [noteData]);
+
+  // Auto-save 1.2s after the user stops typing
+  useEffect(() => {
+    if (!hasUnsavedChanges || saveMut.isPending) return;
+    if (!content.trim() && !noteId) return;
+
+    setSaveStatus("Unsaved changes…");
+
+    saveTimer.current = setTimeout(() => {
+      saveMut.mutate({ content, quiet: true });
+    }, 100);
+
+    return () => {
+      if (saveTimer.current) {
+        clearTimeout(saveTimer.current);
+      }
+    };
+  }, [content, hasUnsavedChanges, noteId, saveMut]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        event.preventDefault();
+        event.returnValue = "You have unsaved changes.";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const isSaveShortcut = (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s";
+      if (!isSaveShortcut) return;
+
+      event.preventDefault();
+      if (saveMut.isPending) return;
+      if (!content.trim() && !noteId) {
+        toast.error("Cannot save empty notes");
+        return;
+      }
+
+      handleSave();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [content, handleSave, noteId, saveMut.isPending]);
 
   if (isLoading) {
     return (
