@@ -15,7 +15,7 @@ const links = [
   { href: "/notes", label: "Notes", icon: FileText },
   { href: "/reports", label: "Reports", icon: BarChart3 },
   { href: "/analytics", label: "Analytics", icon: PieChart },
-  { href: "/settings", label: "Admin", icon: Shield },
+  { href: "/settings", label: "Settings", icon: Shield },
 ];
 
 type User = { name?: string | null; email?: string | null; role?: string };
