@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { Plus, Trash2, Download } from "lucide-react";
@@ -12,29 +12,13 @@ const EXPENSE_CATS = ["Withdrawal","Load Cost","Fees","General","Other"];
 
 function entryNet(e: Entry) { return e.type === "expense" ? -e.amount : e.amount; }
 
-function getPHDate() {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
-}
-
 export default function SalaryPage() {
   const qc = useQueryClient();
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth());
   const [year, setYear] = useState(now.getFullYear());
-  const [currentPHDate, setCurrentPHDate] = useState(getPHDate());
-  const [form, setForm] = useState({ type: "profit", amount: "", category: "Profit", notes: "" });
+  const [form, setForm] = useState({ date: new Date().toISOString().slice(0,10), type: "profit", amount: "", category: "Profit", notes: "" });
   const [editNotes, setEditNotes] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const newDate = getPHDate();
-      if (newDate !== currentPHDate) {
-        setCurrentPHDate(newDate);
-        setForm(f => ({...f, date: newDate}));
-      }
-    }, 60000); // check every minute
-    return () => clearInterval(interval);
-  }, [currentPHDate]);
 
   const { data: entries = [] } = useQuery<Entry[]>({
     queryKey: ["salary", month, year],
@@ -42,19 +26,9 @@ export default function SalaryPage() {
   });
 
   const addMut = useMutation({
-    mutationFn: async (data: any) => {
-      const res = await fetch("/api/salary", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(data) });
-      const body = await res.json();
-      if (!res.ok) throw new Error(body.error || "Failed to add entry");
-      return body;
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["salary"] });
-      qc.invalidateQueries({ queryKey: ["dashboard"] });
-      toast.success("Entry added!");
-      setForm(f => ({...f, amount: "", notes: ""}));
-    },
-    onError: (e: any) => toast.error(e?.message || "Failed to add entry."),
+    mutationFn: (data: any) => fetch("/api/salary", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(data) }).then(r => r.json()),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["salary"] }); qc.invalidateQueries({ queryKey: ["dashboard"] }); toast.success("Entry added!"); setForm(f => ({...f, amount: "", notes: ""})); },
+    onError: () => toast.error("Failed to add entry."),
   });
 
   const delMut = useMutation({
@@ -70,7 +44,7 @@ export default function SalaryPage() {
   function handleAdd(e: React.FormEvent) {
     e.preventDefault();
     if (!form.amount || parseFloat(form.amount) <= 0) { toast.error("Enter a valid amount."); return; }
-    addMut.mutate({ date: currentPHDate, type: form.type, amount: parseFloat(form.amount), category: form.category, notes: form.notes });
+    addMut.mutate({ date: form.date, type: form.type, amount: parseFloat(form.amount), category: form.category, notes: form.notes });
   }
 
   const totalProfit = entries.filter(e => e.type === "profit").reduce((s, e) => s + e.amount, 0);
@@ -139,10 +113,9 @@ export default function SalaryPage() {
         <div className="bg-[rgba(15,15,15,0.92)] border border-white/[0.07] rounded-lg p-5">
           <div className="font-display text-lg tracking-[2px] text-white mb-4">ADD <span className="text-[#e74c3c]">ENTRY</span></div>
           <form onSubmit={handleAdd} className="space-y-3">
-            <div className="flex items-center gap-2 px-3 py-2 bg-white/[0.04] border border-white/[0.07] rounded text-xs text-[#888]">
-              <span className="uppercase tracking-widest">Date:</span>
-              <span className="text-white font-mono">{currentPHDate}</span>
-              <span className="ml-auto text-[10px] text-[#555]">auto</span>
+            <div>
+              <label className="block text-[10px] uppercase tracking-widest text-[#888] mb-1">Date</label>
+              <input type="date" value={form.date} onChange={e => setForm(f=>({...f,date:e.target.value}))} className="w-full bg-white/[0.04] border border-white/[0.07] rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-red-700" />
             </div>
             <div>
               <label className="block text-[10px] uppercase tracking-widest text-[#888] mb-1">Type</label>
@@ -228,7 +201,7 @@ export default function SalaryPage() {
                 const profit = dayEntries.filter(e=>e.type==="profit").reduce((s,e)=>s+e.amount,0);
                 const expense = dayEntries.filter(e=>e.type==="expense").reduce((s,e)=>s+e.amount,0);
                 const net = profit - expense;
-                const isToday = ds === currentPHDate;
+                const isToday = ds === new Date().toISOString().slice(0,10);
                 return (
                   <tr key={ds} className={`border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors ${isToday ? "bg-white/[0.03]" : ""}`}>
                     <td className="px-4 py-2 font-display text-lg text-[#555]">{String(day).padStart(2,"0")}</td>
