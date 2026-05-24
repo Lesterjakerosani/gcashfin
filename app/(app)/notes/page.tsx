@@ -23,7 +23,6 @@ export default function NotesPage() {
   const [content, setContent] = useState("");
   const [noteId, setNoteId] = useState<string | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [saveStatus, setSaveStatus] = useState("All changes saved");
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { data: noteData, isLoading, error: fetchError } = useQuery<NoteResponse>({
@@ -63,22 +62,19 @@ export default function NotesPage() {
     },
     onSuccess: (data, variables) => {
       if (data.note?.id) setNoteId(data.note.id);
-      qc.invalidateQueries({ queryKey: ["notes"] });
-
-      if (variables?.quiet) {
-        setSaveStatus("Auto-saved");
-      } else {
-        toast.success("Notes saved!");
-        setSaveStatus("All changes saved");
-      }
       setHasUnsavedChanges(false);
+
+      if (!variables?.quiet) {
+        // Only update query cache and show toast on manual save
+        qc.invalidateQueries({ queryKey: ["notes"] });
+        toast.success("Notes saved!");
+      }
     },
     onError: (error, variables) => {
       const message = error instanceof Error ? error.message : "Failed to save notes";
       if (!variables?.quiet) {
         toast.error(message);
       }
-      setSaveStatus("Save failed");
     },
   });
 
@@ -119,7 +115,6 @@ export default function NotesPage() {
       saveTimer.current = null;
     }
 
-    setSaveStatus("Saving…");
     saveMut.mutate({ content, quiet: false });
     setHasUnsavedChanges(false);
   }, [content, noteId, saveMut]);
@@ -130,30 +125,26 @@ export default function NotesPage() {
     }
   }, [deleteMut]);
 
+  // Load initial note data into state
   useEffect(() => {
     if (noteData?.success) {
       setContent(noteData.content || "");
       setNoteId(noteData.id || null);
       setHasUnsavedChanges(false);
-      setSaveStatus("All changes saved");
     }
   }, [noteData]);
 
-  // Auto-save 1.2s after the user stops typing
+  // Silent auto-save 100ms after user stops typing — no status changes, no refetch
   useEffect(() => {
     if (!hasUnsavedChanges || saveMut.isPending) return;
     if (!content.trim() && !noteId) return;
-
-    setSaveStatus("Unsaved changes…");
 
     saveTimer.current = setTimeout(() => {
       saveMut.mutate({ content, quiet: true });
     }, 100);
 
     return () => {
-      if (saveTimer.current) {
-        clearTimeout(saveTimer.current);
-      }
+      if (saveTimer.current) clearTimeout(saveTimer.current);
     };
   }, [content, hasUnsavedChanges, noteId, saveMut]);
 
@@ -232,7 +223,7 @@ export default function NotesPage() {
               disabled={saveMut.isPending}
               className="flex items-center gap-2 bg-[#c0392b] hover:bg-[#e74c3c] text-white px-4 py-1.5 rounded text-sm font-semibold tracking-wide transition-all disabled:opacity-50"
             >
-              <Save size={14} /> {saveMut.isPending ? "Saving…" : "Save"}
+              <Save size={14} /> Save
             </button>
           </div>
         </div>
@@ -241,16 +232,12 @@ export default function NotesPage() {
           onChange={(e) => {
             setContent(e.target.value);
             setHasUnsavedChanges(true);
-            setSaveStatus("Unsaved changes");
           }}
           placeholder="Start writing your notes here..."
           className="w-full h-[500px] bg-white/[0.04] border border-white/[0.07] rounded px-4 py-3 text-sm text-white placeholder-[#555] focus:outline-none focus:border-[#e74c3c]/50 resize-none transition-colors"
           style={{ fontFamily: "monospace" }}
         />
       </div>
-      <p className="text-[#555] text-xs mt-4 text-right">
-        {saveStatus} • Last saved ID: {noteId || "pending"}
-      </p>
     </div>
   );
 }
