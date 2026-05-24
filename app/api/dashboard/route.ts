@@ -28,10 +28,16 @@ export async function GET(req: NextRequest) {
   const monthlyProfit = salary.filter((e) => e.date.startsWith(monthPrefix)).reduce((s, e) => s + entryNet(e), 0);
   const dailyProfit = salary.filter((e) => e.date === todayStr).reduce((s, e) => s + entryNet(e), 0);
 
-  const dMap: Record<string, number> = {};
-  salary.forEach((e) => { dMap[e.date] = (dMap[e.date] || 0) + entryNet(e); });
+  const currentYear = now.getFullYear();
   let highestDay = 0, highestDate = "—";
-  Object.entries(dMap).forEach(([d, v]) => { if (v > highestDay) { highestDay = v; highestDate = d; } });
+  for (let month = 0; month < 12; month++) {
+    const daysInMonth = new Date(currentYear, month + 1, 0).getDate();
+    for (let day = 1; day <= daysInMonth; day++) {
+      const ds = `${currentYear}-${pad(month+1)}-${pad(day)}`;
+      const v = salary.filter((e) => e.date === ds).reduce((s, e) => s + entryNet(e), 0);
+      if (v > highestDay) { highestDay = v; highestDate = ds; }
+    }
+  }
 
   return NextResponse.json({
     totalAccounts: active.length, totalBalance, totalUsed,
