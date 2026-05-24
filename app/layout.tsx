@@ -8,7 +8,7 @@ const dmMono = DM_Mono({ weight: ["300","400","500"], subsets: ["latin"], variab
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-body" });
 
 export const metadata: Metadata = {
-  title: "GCashFin — Financial Management System",
+  title: "GCashFin",
   description: "Professional GCash account & salary tracking system",
   icons: {
     icon: "/favicon.ico",
