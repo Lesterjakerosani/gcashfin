@@ -1,77 +1,137 @@
 "use client";
 import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { Save, LogOut, AlertTriangle, Shield, Database, Palette, User } from "lucide-react";
+import { Save, LogOut, AlertTriangle, Shield, Users, User, Plus, Trash2, Eye, EyeOff } from "lucide-react";
 
-type Panel = "profile" | "display" | "data" | "danger";
+type Panel = "users" | "profile" | "danger";
 
 const PANELS: { key: Panel; label: string; icon: any }[] = [
-  { key: "profile", label: "Profile", icon: User },
-  { key: "display", label: "Display", icon: Palette },
-  { key: "data", label: "Data & Backup", icon: Database },
+  { key: "users", label: "User Management", icon: Users },
+  { key: "profile", label: "My Profile", icon: User },
   { key: "danger", label: "Danger Zone", icon: AlertTriangle },
 ];
 
-export default function SettingsPage() {
+type SysUser = { id: string; name: string; email: string; role: string; createdAt: string };
+
+export default function AdminPage() {
   const { data: session } = useSession();
-  const [panel, setPanel] = useState<Panel>("profile");
+  const qc = useQueryClient();
+  const [panel, setPanel] = useState<Panel>("users");
+
+  // Profile state
   const [name, setName] = useState(session?.user?.name || "");
-  const [oldPw, setOldPw] = useState(""); const [newPw, setNewPw] = useState(""); const [confPw, setConfPw] = useState("");
+  const [oldPw, setOldPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [confPw, setConfPw] = useState("");
+  const [showPw, setShowPw] = useState(false);
+
+  // Add user state
+  const [addForm, setAddForm] = useState({ name: "", email: "", password: "", role: "admin" });
+  const [showAddForm, setShowAddForm] = useState(false);
+
+  const isAdmin = (session?.user as any)?.role === "admin";
+
+  const { data: users = [] } = useQuery<SysUser[]>({
+    queryKey: ["admin-users"],
+    queryFn: () => fetch("/api/admin/users").then(r => r.json()),
+    enabled: isAdmin,
+  });
 
   const saveMut = useMutation({
-    mutationFn: async (key: string) => {
-      const res = await fetch("/api/settings", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ key, value: name }) });
-      if (!res.ok) throw new Error((await res.json()).error || "Failed to save settings");
+    mutationFn: async () => {
+      const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: "displayName", value: name }),
+      });
+      if (!res.ok) throw new Error((await res.json()).error || "Failed");
     },
-    onSuccess: () => toast.success("Settings saved."),
-    onError: (error: any) => toast.error(error?.message || "Unable to save settings."),
+    onSuccess: () => toast.success("Display name updated."),
+    onError: (e: any) => toast.error(e?.message || "Failed to save."),
   });
 
   const pwMut = useMutation({
-    mutationFn: async (data: { currentPassword: string; newPassword: string; confirmPassword: string }) => {
+    mutationFn: async () => {
       const res = await fetch("/api/auth/change-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ currentPassword: oldPw, newPassword: newPw, confirmPassword: confPw }),
       });
       const body = await res.json();
-      if (!res.ok) throw new Error(body.error || "Unable to update password.");
+      if (!res.ok) throw new Error(body.error || "Failed");
+    },
+    onSuccess: () => {
+      toast.success("Password updated!");
+      setOldPw(""); setNewPw(""); setConfPw("");
+    },
+    onError: (e: any) => toast.error(e?.message || "Password update failed."),
+  });
+
+  const addUserMut = useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(addForm),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || "Failed");
       return body;
     },
     onSuccess: () => {
-      toast.success("Password updated successfully!");
-      setOldPw(""); setNewPw(""); setConfPw("");
+      toast.success("User created!");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+      setAddForm({ name: "", email: "", password: "", role: "admin" });
+      setShowAddForm(false);
     },
-    onError: (error: any) => toast.error(error?.message || "Password update failed."),
+    onError: (e: any) => toast.error(e?.message || "Failed to create user."),
+  });
+
+  const deleteUserMut = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch("/api/admin/users", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || "Failed");
+    },
+    onSuccess: () => {
+      toast.success("User deleted.");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (e: any) => toast.error(e?.message || "Failed to delete user."),
   });
 
   function handleChangePw(e: React.FormEvent) {
     e.preventDefault();
-    if (!oldPw || !newPw || !confPw) {
-      toast.error("Please fill all password fields.");
-      return;
-    }
-    if (newPw !== confPw) {
-      toast.error("Passwords do not match.");
-      return;
-    }
-    if (newPw.length < 6) {
-      toast.error("Password must be at least 6 characters.");
-      return;
-    }
-    pwMut.mutate({ currentPassword: oldPw, newPassword: newPw, confirmPassword: confPw });
+    if (!oldPw || !newPw || !confPw) { toast.error("Fill all fields."); return; }
+    if (newPw !== confPw) { toast.error("Passwords do not match."); return; }
+    if (newPw.length < 6) { toast.error("Minimum 6 characters."); return; }
+    pwMut.mutate();
   }
 
-  function exportData() {
-    toast.success("Contact your admin to export full database backup.");
+  if (!isAdmin) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center">
+          <Shield size={40} className="text-[#e74c3c] mx-auto mb-3" />
+          <div className="text-white font-semibold mb-1">Admin Access Only</div>
+          <p className="text-[#888] text-sm">You don&apos;t have permission to view this page.</p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div>
-      <div className="font-display text-4xl tracking-[4px] text-white mb-1">SYSTEM <span className="text-[#e74c3c]">SETTINGS</span></div>
-      <p className="text-[#888] text-sm mb-6">Configure your GCash Fintech management system</p>
+      <div className="font-display text-4xl tracking-[4px] text-white mb-1">
+        ADMIN <span className="text-[#e74c3c]">PANEL</span>
+      </div>
+      <p className="text-[#888] text-sm mb-6">System administration and user management</p>
 
       <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-5">
         {/* Nav */}
@@ -91,10 +151,116 @@ export default function SettingsPage() {
         </div>
 
         <div>
-          {/* Profile */}
+          {/* User Management */}
+          {panel === "users" && (
+            <div className="bg-[rgba(15,15,15,0.92)] border border-white/[0.07] rounded-lg p-6">
+              <div className="flex items-center justify-between mb-5">
+                <div className="font-display text-xl tracking-[2px] text-white">USER <span className="text-[#e74c3c]">MANAGEMENT</span></div>
+                <button onClick={() => setShowAddForm(v => !v)}
+                  className="flex items-center gap-1.5 bg-[#c0392b] hover:bg-[#e74c3c] text-white px-3 py-2 rounded text-xs font-semibold transition-all">
+                  <Plus size={12} /> Add User
+                </button>
+              </div>
+
+              {/* Add User Form */}
+              {showAddForm && (
+                <div className="mb-5 p-4 bg-white/[0.03] border border-white/[0.07] rounded-lg">
+                  <div className="text-xs uppercase tracking-widest text-[#888] mb-3">New User</div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                    <div>
+                      <label className="block text-[10px] uppercase tracking-widest text-[#888] mb-1">Name</label>
+                      <input value={addForm.name} onChange={e => setAddForm(f => ({ ...f, name: e.target.value }))}
+                        placeholder="Full name" className="w-full bg-white/[0.04] border border-white/[0.07] rounded px-3 py-2 text-sm text-white placeholder-[#555] focus:outline-none focus:border-red-700" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] uppercase tracking-widest text-[#888] mb-1">Email</label>
+                      <input type="email" value={addForm.email} onChange={e => setAddForm(f => ({ ...f, email: e.target.value }))}
+                        placeholder="email@example.com" className="w-full bg-white/[0.04] border border-white/[0.07] rounded px-3 py-2 text-sm text-white placeholder-[#555] focus:outline-none focus:border-red-700" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] uppercase tracking-widest text-[#888] mb-1">Password</label>
+                      <input type="password" value={addForm.password} onChange={e => setAddForm(f => ({ ...f, password: e.target.value }))}
+                        placeholder="Min 6 characters" className="w-full bg-white/[0.04] border border-white/[0.07] rounded px-3 py-2 text-sm text-white placeholder-[#555] focus:outline-none focus:border-red-700" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] uppercase tracking-widest text-[#888] mb-1">Role</label>
+                      <select value={addForm.role} onChange={e => setAddForm(f => ({ ...f, role: e.target.value }))}
+                        className="w-full bg-[#111] border border-white/[0.07] rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-red-700">
+                        <option value="admin">Admin</option>
+                        <option value="user">User</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => addUserMut.mutate()} disabled={addUserMut.isPending}
+                      className="flex items-center gap-1.5 bg-[#c0392b] hover:bg-[#e74c3c] text-white px-4 py-2 rounded text-sm transition-all disabled:opacity-50">
+                      <Plus size={12} /> {addUserMut.isPending ? "Creating…" : "Create User"}
+                    </button>
+                    <button onClick={() => setShowAddForm(false)}
+                      className="px-4 py-2 border border-white/[0.07] text-[#888] hover:text-white rounded text-sm transition-colors">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Users Table */}
+              <div className="overflow-hidden rounded-lg border border-white/[0.07]">
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr>
+                      {["Name", "Email", "Role", "Joined", "Actions"].map(h => (
+                        <th key={h} className="bg-[rgba(10,10,10,0.9)] text-[#888] text-[10px] font-semibold uppercase tracking-[1.2px] px-4 py-2.5 border-b border-white/[0.07] text-left">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.length === 0 ? (
+                      <tr><td colSpan={5} className="text-center py-8 text-[#555] text-xs">No users found.</td></tr>
+                    ) : users.map(u => (
+                      <tr key={u.id} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-full bg-[#c0392b] flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+                              {u.name[0].toUpperCase()}
+                            </div>
+                            <span className="text-white">{u.name}</span>
+                            {u.id === (session?.user as any)?.id && (
+                              <span className="text-[10px] text-[#555] bg-white/[0.04] px-1.5 py-0.5 rounded">you</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-[#888] text-xs">{u.email}</td>
+                        <td className="px-4 py-3">
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold border ${u.role === "admin" ? "bg-[rgba(192,57,43,0.15)] text-[#e74c3c] border-red-700/30" : "bg-white/[0.05] text-[#888] border-white/[0.07]"}`}>
+                            {u.role}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-[#555] text-xs">
+                          {new Date(u.createdAt).toLocaleDateString("en-PH", { year: "numeric", month: "short", day: "numeric" })}
+                        </td>
+                        <td className="px-4 py-3">
+                          <button
+                            onClick={() => { if (confirm(`Delete user "${u.name}"?`)) deleteUserMut.mutate(u.id); }}
+                            disabled={u.id === (session?.user as any)?.id}
+                            className="text-[#555] hover:text-[#e74c3c] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            title={u.id === (session?.user as any)?.id ? "Cannot delete yourself" : "Delete user"}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* My Profile */}
           {panel === "profile" && (
             <div className="bg-[rgba(15,15,15,0.92)] border border-white/[0.07] rounded-lg p-6 space-y-5">
-              <div className="font-display text-xl tracking-[2px] text-white">PROFILE <span className="text-[#e74c3c]">SETTINGS</span></div>
+              <div className="font-display text-xl tracking-[2px] text-white">MY <span className="text-[#e74c3c]">PROFILE</span></div>
               <div className="flex items-center gap-4 pb-4 border-b border-white/[0.07]">
                 <div className="w-16 h-16 rounded-full bg-[#c0392b] flex items-center justify-center text-2xl font-bold text-white">
                   {(session?.user?.name || "A")[0].toUpperCase()}
@@ -102,14 +268,20 @@ export default function SettingsPage() {
                 <div>
                   <div className="text-white font-semibold">{session?.user?.name}</div>
                   <div className="text-[#888] text-sm">{session?.user?.email}</div>
-                  <div className="bg-[rgba(192,57,43,0.15)] text-[#e74c3c] text-[10px] px-2 py-0.5 rounded-full border border-red-700/30 mt-1 inline-block uppercase tracking-widest">{session?.user?.role || "admin"}</div>
+                  <div className="bg-[rgba(192,57,43,0.15)] text-[#e74c3c] text-[10px] px-2 py-0.5 rounded-full border border-red-700/30 mt-1 inline-block uppercase tracking-widest">
+                    {(session?.user as any)?.role || "admin"}
+                  </div>
                 </div>
               </div>
               <div>
                 <label className="block text-[10px] uppercase tracking-widest text-[#888] mb-1.5">Display Name</label>
                 <div className="flex gap-2">
-                  <input value={name} onChange={e=>setName(e.target.value)} className="flex-1 bg-white/[0.04] border border-white/[0.07] rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-red-700" />
-                  <button onClick={() => saveMut.mutate("displayName")} className="flex items-center gap-1.5 bg-[#c0392b] hover:bg-[#e74c3c] text-white px-4 py-2 rounded text-sm transition-all"><Save size={12} /> Save</button>
+                  <input value={name} onChange={e => setName(e.target.value)}
+                    className="flex-1 bg-white/[0.04] border border-white/[0.07] rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-red-700" />
+                  <button onClick={() => saveMut.mutate()} disabled={saveMut.isPending}
+                    className="flex items-center gap-1.5 bg-[#c0392b] hover:bg-[#e74c3c] text-white px-4 py-2 rounded text-sm transition-all disabled:opacity-50">
+                    <Save size={12} /> Save
+                  </button>
                 </div>
               </div>
               <div className="border-t border-white/[0.07] pt-5">
@@ -122,86 +294,38 @@ export default function SettingsPage() {
                   ].map(f => (
                     <div key={f.label}>
                       <label className="block text-[10px] uppercase tracking-widest text-[#888] mb-1.5">{f.label}</label>
-                      <input type="password" value={f.value} onChange={e=>f.set(e.target.value)} required className="w-full bg-white/[0.04] border border-white/[0.07] rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-red-700" />
+                      <div className="relative">
+                        <input type={showPw ? "text" : "password"} value={f.value} onChange={e => f.set(e.target.value)} required
+                          className="w-full bg-white/[0.04] border border-white/[0.07] rounded px-3 py-2 pr-9 text-sm text-white focus:outline-none focus:border-red-700" />
+                        {f.label === "Current Password" && (
+                          <button type="button" onClick={() => setShowPw(v => !v)}
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#555] hover:text-[#888]">
+                            {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ))}
-                  <button
-                    type="submit"
-                    disabled={pwMut.isPending}
-                    className="flex items-center gap-1.5 bg-[#c0392b] hover:bg-[#e74c3c] disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded text-sm transition-all mt-1"
-                  >
-                    <Save size={12} />
-                    {pwMut.isPending ? "Updating..." : "Update Password"}
+                  <button type="submit" disabled={pwMut.isPending}
+                    className="flex items-center gap-1.5 bg-[#c0392b] hover:bg-[#e74c3c] disabled:opacity-50 text-white px-4 py-2 rounded text-sm transition-all">
+                    <Save size={12} /> {pwMut.isPending ? "Updating…" : "Update Password"}
                   </button>
                 </form>
               </div>
             </div>
           )}
 
-          {/* Display */}
-          {panel === "display" && (
-            <div className="bg-[rgba(15,15,15,0.92)] border border-white/[0.07] rounded-lg p-6">
-              <div className="font-display text-xl tracking-[2px] text-white mb-5">DISPLAY <span className="text-[#e74c3c]">SETTINGS</span></div>
-              {[
-                { label: "Dark Theme", sub: "The system uses a dark theme optimized for financial data", enabled: true },
-                { label: "Compact Tables", sub: "Show more rows in account and transaction tables", enabled: false },
-                { label: "Animated Charts", sub: "Enable smooth animations on analytics charts", enabled: true },
-                { label: "Show Archived Accounts", sub: "Include archived accounts in the default view", enabled: false },
-              ].map(s => (
-                <div key={s.label} className="flex items-center justify-between py-3 border-b border-white/[0.04] last:border-0">
-                  <div>
-                    <div className="text-sm text-white">{s.label}</div>
-                    <div className="text-[11px] text-[#888]">{s.sub}</div>
-                  </div>
-                  <div className={`w-11 h-6 rounded-full transition-colors cursor-pointer relative flex-shrink-0 ${s.enabled ? "bg-[#c0392b]" : "bg-white/[0.1]"}`}>
-                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${s.enabled ? "left-6" : "left-1"}`} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Data */}
-          {panel === "data" && (
-            <div className="bg-[rgba(15,15,15,0.92)] border border-white/[0.07] rounded-lg p-6">
-              <div className="font-display text-xl tracking-[2px] text-white mb-5">DATA & <span className="text-[#e74c3c]">BACKUP</span></div>
-              <div className="space-y-3">
-                {[
-                  { label: "Export All Data (CSV)", sub: "Download a full CSV export of all transactions", action: exportData, variant: "outline" },
-                  { label: "Export Salary Report (CSV)", sub: "Download salary and expense entries", action: exportData, variant: "outline" },
-                  { label: "Backup Database", sub: "Contact your server admin for database backup", action: () => toast.success("Contact your database admin for backups."), variant: "outline" },
-                ].map(b => (
-                  <div key={b.label} className="flex items-center justify-between py-3 border-b border-white/[0.04] last:border-0">
-                    <div>
-                      <div className="text-sm text-white">{b.label}</div>
-                      <div className="text-[11px] text-[#888]">{b.sub}</div>
-                    </div>
-                    <button onClick={b.action} className="border border-white/[0.07] text-[#888] hover:text-white hover:border-white/20 px-3 py-1.5 rounded text-xs transition-colors flex-shrink-0 ml-4">Export</button>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-5 p-4 bg-white/[0.02] border border-white/[0.05] rounded-lg">
-                <div className="flex items-center gap-2 text-[#888] text-sm mb-2"><Database size={14} /> Database Info</div>
-                <div className="text-xs text-[#555] space-y-1">
-                  <div>Provider: <span className="text-[#888]">PostgreSQL</span></div>
-                  <div>ORM: <span className="text-[#888]">Prisma</span></div>
-                  <div>Storage: <span className="text-[#888]">Cloud / Server</span></div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Danger */}
+          {/* Danger Zone */}
           {panel === "danger" && (
             <div className="bg-[rgba(15,15,15,0.92)] border border-red-800/30 rounded-lg p-6">
               <div className="font-display text-xl tracking-[2px] text-[#e74c3c] mb-2">DANGER <span className="text-white">ZONE</span></div>
-              <p className="text-[#888] text-sm mb-5">These actions are irreversible. Proceed with extreme caution.</p>
+              <p className="text-[#888] text-sm mb-5">These actions are irreversible. Admin eyes only.</p>
               <div className="space-y-4">
                 {[
-                  { label: "Clear All Transactions", sub: "Delete all transaction history permanently", action: () => toast.error("Action disabled — contact admin to perform data operations on the server.") },
-                  { label: "Clear Salary Entries", sub: "Delete all salary and expense records permanently", action: () => toast.error("Action disabled — contact admin to perform data operations on the server.") },
-                  { label: "Delete All Accounts", sub: "Remove all GCash account records permanently", action: () => toast.error("Action disabled — contact admin to perform data operations on the server.") },
-                  { label: "Full System Reset", sub: "Delete ALL data across the entire system", action: () => toast.error("Action disabled — contact admin to perform data operations on the server.") },
+                  { label: "Clear All Transactions", sub: "Delete all transaction history permanently" },
+                  { label: "Clear Salary Entries", sub: "Delete all salary and expense records permanently" },
+                  { label: "Delete All Accounts", sub: "Remove all GCash account records permanently" },
+                  { label: "Full System Reset", sub: "Delete ALL data across the entire system" },
                 ].map(b => (
                   <div key={b.label} className="flex items-center justify-between py-3 border-b border-white/[0.04] last:border-0">
                     <div className="flex items-start gap-2">
@@ -211,7 +335,12 @@ export default function SettingsPage() {
                         <div className="text-[11px] text-[#888]">{b.sub}</div>
                       </div>
                     </div>
-                    <button onClick={b.action} className="border border-red-700/30 text-[#e74c3c] hover:bg-red-900/20 px-3 py-1.5 rounded text-xs transition-colors flex-shrink-0 ml-4">Delete</button>
+                    <button
+                      onClick={() => toast.error("Contact your database admin to perform this operation.")}
+                      className="border border-red-700/30 text-[#e74c3c] hover:bg-red-900/20 px-3 py-1.5 rounded text-xs transition-colors flex-shrink-0 ml-4"
+                    >
+                      Delete
+                    </button>
                   </div>
                 ))}
               </div>

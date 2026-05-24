@@ -3,7 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { LayoutDashboard, DollarSign, BarChart3, PieChart, Settings, LogOut, Menu, X, FileText } from "lucide-react";
+import { LayoutDashboard, DollarSign, BarChart3, PieChart, Shield, LogOut, Menu, X, FileText } from "lucide-react";
 
 const links = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -11,7 +11,7 @@ const links = [
   { href: "/notes", label: "Notes", icon: FileText },
   { href: "/reports", label: "Reports", icon: BarChart3 },
   { href: "/analytics", label: "Analytics", icon: PieChart },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/settings", label: "Admin", icon: Shield },
 ];
 
 export function Navbar({ user }: { user: { name?: string | null; email?: string | null; role?: string } }) {
