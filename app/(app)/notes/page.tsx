@@ -46,7 +46,6 @@ export default function NotesPage() {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
-
       if (!res.ok) {
         const errorData = await res.json();
         const errorMessage = errorData.details
@@ -54,7 +53,6 @@ export default function NotesPage() {
           : errorData.error || `HTTP ${res.status}`;
         throw new Error(errorMessage);
       }
-
       return res.json();
     },
     retry: 2,
@@ -68,18 +66,15 @@ export default function NotesPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: contentToSave }),
       });
-
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.details || errorData.error || `HTTP ${res.status}`);
       }
-
       return res.json();
     },
     onSuccess: (data, variables) => {
       if (data.note?.id) setNoteId(data.note.id);
       setHasUnsavedChanges(false);
-
       if (variables?.quiet) {
         showStatus("saved", true);
       } else {
@@ -101,12 +96,10 @@ export default function NotesPage() {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       });
-
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.error || `HTTP ${res.status}`);
       }
-
       return res.json();
     },
     onSuccess: () => {
@@ -129,12 +122,10 @@ export default function NotesPage() {
       toast.error("Cannot save empty notes");
       return;
     }
-
     if (saveTimer.current) {
       clearTimeout(saveTimer.current);
       saveTimer.current = null;
     }
-
     showStatus("saving");
     saveMut.mutate({ content, quiet: false });
     setHasUnsavedChanges(false);
@@ -154,7 +145,6 @@ export default function NotesPage() {
     }
   }, [noteData]);
 
-  // Google Docs-style auto-save: 1s after user stops typing
   useEffect(() => {
     if (!hasUnsavedChanges || saveMut.isPending) return;
     if (!content.trim() && !noteId) return;
@@ -176,7 +166,6 @@ export default function NotesPage() {
         event.returnValue = "You have unsaved changes.";
       }
     };
-
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [hasUnsavedChanges]);
@@ -185,17 +174,14 @@ export default function NotesPage() {
     const handleKeyDown = (event: KeyboardEvent) => {
       const isSaveShortcut = (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s";
       if (!isSaveShortcut) return;
-
       event.preventDefault();
       if (saveMut.isPending) return;
       if (!content.trim() && !noteId) {
         toast.error("Cannot save empty notes");
         return;
       }
-
       handleSave();
     };
-
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [content, handleSave, noteId, saveMut.isPending]);
@@ -208,18 +194,18 @@ export default function NotesPage() {
   }[saveStatus];
 
   const statusColor = {
-    saving: "text-[#888]",
-    saved: "text-[#4caf50]",
-    unsaved: "text-[#888]",
-    error: "text-red-400",
+    saving: "text-gray-400 dark:text-slate-500",
+    saved: "text-emerald-600 dark:text-emerald-400",
+    unsaved: "text-gray-400 dark:text-slate-500",
+    error: "text-red-500",
   }[saveStatus];
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-white text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#e74c3c] mx-auto mb-4"></div>
-          <p>Loading notes...</p>
+      <div className="flex items-center justify-center min-h-[40vh]">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-gray-200 dark:border-slate-700 border-t-gray-900 dark:border-t-white rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-gray-500 dark:text-slate-400">Loading notes...</p>
         </div>
       </div>
     );
@@ -227,10 +213,10 @@ export default function NotesPage() {
 
   if (fetchError) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center bg-[rgba(15,15,15,0.92)] border border-red-700/30 rounded-lg p-6 max-w-md">
-          <p className="text-red-500 mb-2">Error loading notes:</p>
-          <p className="text-[#888] text-sm">
+      <div className="flex items-center justify-center min-h-[40vh]">
+        <div className="card p-6 max-w-md text-center">
+          <p className="text-red-500 font-medium mb-2">Error loading notes</p>
+          <p className="text-sm text-gray-500 dark:text-slate-400">
             {fetchError instanceof Error ? fetchError.message : "Unknown error"}
           </p>
         </div>
@@ -239,25 +225,22 @@ export default function NotesPage() {
   }
 
   return (
-    <div>
-      <div className="font-display text-4xl tracking-[4px] text-white mb-1">
-        NOTES <span className="text-[#e74c3c]">PAD</span>
+    <div className="space-y-6">
+      <div>
+        <h1 className="page-title">Notes</h1>
+        <p className="page-subtitle">Your personal notepad — changes save automatically</p>
       </div>
-      <p className="text-[#888] text-sm mb-6">Your personal notepad</p>
 
-      <div className="bg-[rgba(15,15,15,0.92)] border border-white/[0.07] rounded-lg p-6">
-        <div className="flex items-center gap-2 mb-4 flex-wrap">
-          <FileText size={20} className="text-[#888]" />
-          <span className="text-white font-semibold">My Notes</span>
+      <div className="card p-6">
+        <div className="flex items-center gap-3 mb-4 flex-wrap">
+          <FileText size={18} className="text-gray-400 dark:text-slate-500" />
+          <span className="section-title">My Notes</span>
 
-          {/* Google Docs-style subtle save status */}
-          <div
-            className={`flex items-center gap-1.5 ml-3 transition-opacity duration-500 ${statusVisible ? "opacity-100" : "opacity-0"}`}
-          >
+          <div className={`flex items-center gap-1.5 ml-2 transition-opacity duration-500 ${statusVisible ? "opacity-100" : "opacity-0"}`}>
             {saveStatus === "error" ? (
-              <CloudOff size={13} className="text-red-400" />
+              <CloudOff size={13} className="text-red-500" />
             ) : (
-              <Cloud size={13} className={saveStatus === "saving" ? "text-[#888] animate-pulse" : "text-[#4caf50]"} />
+              <Cloud size={13} className={saveStatus === "saving" ? "text-gray-400 dark:text-slate-500 animate-pulse" : "text-emerald-500 dark:text-emerald-400"} />
             )}
             <span className={`text-xs ${statusColor}`}>{statusLabel}</span>
           </div>
@@ -266,12 +249,13 @@ export default function NotesPage() {
             <button
               onClick={handleDelete}
               disabled={deleteMut.isPending || !noteId}
-              className="flex items-center gap-2 bg-red-900/30 hover:bg-red-900/50 text-red-500 border border-red-700/30 px-3 py-1.5 rounded text-xs font-semibold transition-all disabled:opacity-50"
+              className="btn-danger text-xs px-3 py-1.5 disabled:opacity-40"
             >
-              <Trash2 size={12} /> {deleteMut.isPending ? "Deleting…" : "Delete"}
+              <Trash2 size={13} /> {deleteMut.isPending ? "Deleting…" : "Clear Notes"}
             </button>
           </div>
         </div>
+
         <textarea
           value={content}
           onChange={(e) => {
@@ -280,11 +264,10 @@ export default function NotesPage() {
             showStatus("unsaved");
           }}
           placeholder="Start writing your notes here..."
-          className="w-full h-[500px] bg-white/[0.04] border border-white/[0.07] rounded px-4 py-3 text-sm text-white placeholder-[#555] focus:outline-none focus:border-[#e74c3c]/50 resize-none transition-colors"
-          style={{ fontFamily: "monospace" }}
+          className="w-full h-[520px] bg-gray-50 dark:bg-slate-700/30 border border-gray-200 dark:border-slate-600 rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gray-900/10 dark:focus:ring-white/10 focus:border-gray-300 dark:focus:border-slate-500 resize-none transition-all leading-relaxed font-mono"
         />
       </div>
-      <p className="text-[#444] text-xs mt-3 text-right">Ctrl+S to save manually</p>
+      <p className="text-xs text-gray-400 dark:text-slate-500 text-right">Ctrl+S to save manually</p>
     </div>
   );
 }

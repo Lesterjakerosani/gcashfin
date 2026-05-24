@@ -1,28 +1,26 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, DM_Mono, DM_Sans } from "next/font/google";
+import { DM_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
-const bebasNeue = Bebas_Neue({ weight: "400", subsets: ["latin"], variable: "--font-display" });
-const dmMono = DM_Mono({ weight: ["300","400","500"], subsets: ["latin"], variable: "--font-mono" });
-const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-body" });
+const dmMono = DM_Mono({ weight: ["300", "400", "500"], subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
   title: "GCashFin",
   description: "Professional GCash account & salary tracking system",
-  icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
-  },
+  icons: { icon: "/favicon.ico", shortcut: "/favicon.ico", apple: "/favicon.ico" },
   manifest: "/manifest.json",
-  viewport: "width=device-width, initial-scale=1",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={`${bebasNeue.variable} ${dmMono.variable} ${dmSans.variable} font-body bg-[#0a0a0a] text-[#f0f0f0] min-h-screen`}>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{
+          __html: `try{if(localStorage.getItem('gcashfin-theme')==='dark'){document.documentElement.classList.add('dark')}}catch{}`
+        }} />
+      </head>
+      <body className={`${dmMono.variable} bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-slate-100 antialiased`}>
         <Providers>{children}</Providers>
       </body>
     </html>

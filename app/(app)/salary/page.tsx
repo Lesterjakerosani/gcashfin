@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { Plus, Trash2, Download } from "lucide-react";
+import { Plus, Trash2, Download, TrendingUp, TrendingDown, DollarSign } from "lucide-react";
 import { fmt, MSHORT, MONTHS } from "@/lib/utils";
 
 type Entry = { id: string; date: string; type: string; amount: number; category: string; notes?: string; createdAt: string; };
@@ -51,12 +51,10 @@ export default function SalaryPage() {
   const totalExpense = entries.filter(e => e.type === "expense").reduce((s, e) => s + e.amount, 0);
   const netIncome = totalProfit - totalExpense;
 
-  // Group by date
   const byDate: Record<string, Entry[]> = {};
   entries.forEach(e => { byDate[e.date] = [...(byDate[e.date] || []), e]; });
   const sortedDates = Object.keys(byDate).sort((a,b) => b.localeCompare(a));
 
-  // Spreadsheet: days in month
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const allDays = Array.from({ length: daysInMonth }, (_, i) => {
     const d = i + 1;
@@ -75,104 +73,132 @@ export default function SalaryPage() {
   const years = [now.getFullYear()-1, now.getFullYear(), now.getFullYear()+1];
 
   return (
-    <div>
-      <div className="font-display text-4xl tracking-[4px] text-white mb-1">SALARY <span className="text-[#e74c3c]">TRACKER</span></div>
-      <p className="text-[#888] text-sm mb-6">Track daily profits and expenses</p>
-
-      {/* Month selector */}
-      <div className="flex flex-wrap items-center gap-2 mb-6">
-        <select value={month} onChange={e => setMonth(parseInt(e.target.value))} className="bg-white/[0.04] border border-white/[0.07] rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-red-700">
-          {MONTHS.map((m,i) => <option key={m} value={i}>{m}</option>)}
-        </select>
-        <select value={year} onChange={e => setYear(parseInt(e.target.value))} className="bg-white/[0.04] border border-white/[0.07] rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-red-700">
-          {years.map(y => <option key={y}>{y}</option>)}
-        </select>
-        <button onClick={exportCSV} className="flex items-center gap-1.5 border border-white/[0.07] text-[#888] hover:text-white px-3 py-2 rounded text-xs transition-colors ml-auto">
-          <Download size={12} /> Export CSV
-        </button>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="page-title">Salary Tracker</h1>
+          <p className="page-subtitle">Track daily profits and expenses</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <select value={month} onChange={e => setMonth(parseInt(e.target.value))} className="select-field w-auto">
+            {MONTHS.map((m,i) => <option key={m} value={i}>{m}</option>)}
+          </select>
+          <select value={year} onChange={e => setYear(parseInt(e.target.value))} className="select-field w-auto">
+            {years.map(y => <option key={y}>{y}</option>)}
+          </select>
+          <button onClick={exportCSV} className="btn-secondary gap-1.5">
+            <Download size={14} /> Export CSV
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        <div className="bg-[rgba(15,15,15,0.92)] border border-white/[0.07] rounded-lg p-4">
-          <div className="text-[10px] uppercase tracking-widest text-[#888] mb-2">Total Profit</div>
-          <div className="font-display text-3xl tracking-wider text-[#27ae60]">₱{fmt(totalProfit)}</div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="stat-card">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Total Profit</span>
+            <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center">
+              <TrendingUp size={15} className="text-emerald-600 dark:text-emerald-400" />
+            </div>
+          </div>
+          <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">₱{fmt(totalProfit)}</div>
         </div>
-        <div className="bg-[rgba(15,15,15,0.92)] border border-white/[0.07] rounded-lg p-4">
-          <div className="text-[10px] uppercase tracking-widest text-[#888] mb-2">Total Expense</div>
-          <div className="font-display text-3xl tracking-wider text-[#e74c3c]">₱{fmt(totalExpense)}</div>
+        <div className="stat-card">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Total Expense</span>
+            <div className="w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center">
+              <TrendingDown size={15} className="text-red-500 dark:text-red-400" />
+            </div>
+          </div>
+          <div className="text-2xl font-bold text-red-500 dark:text-red-400">₱{fmt(totalExpense)}</div>
         </div>
-        <div className="bg-[rgba(15,15,15,0.92)] border border-white/[0.07] rounded-lg p-4">
-          <div className="text-[10px] uppercase tracking-widest text-[#888] mb-2">Net Income</div>
-          <div className={`font-display text-3xl tracking-wider ${netIncome >= 0 ? "text-[#27ae60]" : "text-[#e74c3c]"}`}>₱{fmt(netIncome)}</div>
+        <div className="stat-card">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Net Income</span>
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${netIncome >= 0 ? "bg-emerald-100 dark:bg-emerald-900/30" : "bg-red-100 dark:bg-red-900/30"}`}>
+              <DollarSign size={15} className={netIncome >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"} />
+            </div>
+          </div>
+          <div className={`text-2xl font-bold ${netIncome >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"}`}>
+            {netIncome >= 0 ? "+" : ""}₱{fmt(netIncome)}
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Add Entry Form */}
-        <div className="bg-[rgba(15,15,15,0.92)] border border-white/[0.07] rounded-lg p-5">
-          <div className="font-display text-lg tracking-[2px] text-white mb-4">ADD <span className="text-[#e74c3c]">ENTRY</span></div>
-          <form onSubmit={handleAdd} className="space-y-3">
+        <div className="card p-6">
+          <h2 className="section-title mb-4">Add Entry</h2>
+          <form onSubmit={handleAdd} className="space-y-4">
             <div>
-              <label className="block text-[10px] uppercase tracking-widest text-[#888] mb-1">Date</label>
-              <input type="date" value={form.date} onChange={e => setForm(f=>({...f,date:e.target.value}))} className="w-full bg-white/[0.04] border border-white/[0.07] rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-red-700" />
+              <label className="label">Date</label>
+              <input type="date" value={form.date} onChange={e => setForm(f=>({...f,date:e.target.value}))} className="input-field" />
             </div>
             <div>
-              <label className="block text-[10px] uppercase tracking-widest text-[#888] mb-1">Type</label>
+              <label className="label">Type</label>
               <div className="flex gap-2">
                 {["profit","expense"].map(t => (
                   <button key={t} type="button" onClick={() => setForm(f => ({...f, type: t, category: t === "profit" ? "Profit" : "General"}))}
-                    className={`flex-1 py-2 rounded text-xs font-semibold uppercase tracking-wide transition-all ${form.type === t ? (t === "profit" ? "bg-[#27ae60] text-white" : "bg-[#e74c3c] text-white") : "bg-white/[0.04] text-[#888] hover:text-white"}`}>
+                    className={`flex-1 py-2 rounded-xl text-sm font-medium capitalize transition-all ${
+                      form.type === t
+                        ? t === "profit"
+                          ? "bg-emerald-500 text-white shadow-sm"
+                          : "bg-red-500 text-white shadow-sm"
+                        : "bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600"
+                    }`}>
                     {t}
                   </button>
                 ))}
               </div>
             </div>
             <div>
-              <label className="block text-[10px] uppercase tracking-widest text-[#888] mb-1">Amount (₱)</label>
-              <input type="number" step="0.01" value={form.amount} onChange={e => setForm(f=>({...f,amount:e.target.value}))} placeholder="0.00" className="w-full bg-white/[0.04] border border-white/[0.07] rounded px-3 py-2 text-sm text-white font-mono-num focus:outline-none focus:border-red-700" />
+              <label className="label">Amount (₱)</label>
+              <input type="number" step="0.01" value={form.amount} onChange={e => setForm(f=>({...f,amount:e.target.value}))} placeholder="0.00" className="input-field font-mono" />
             </div>
             <div>
-              <label className="block text-[10px] uppercase tracking-widest text-[#888] mb-1">Category</label>
-              <select value={form.category} onChange={e => setForm(f=>({...f,category:e.target.value}))} className="w-full bg-[#111] border border-white/[0.07] rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-red-700">
+              <label className="label">Category</label>
+              <select value={form.category} onChange={e => setForm(f=>({...f,category:e.target.value}))} className="select-field">
                 {(form.type === "profit" ? PROFIT_CATS : EXPENSE_CATS).map(c => <option key={c}>{c}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-[10px] uppercase tracking-widest text-[#888] mb-1">Notes</label>
-              <input value={form.notes} onChange={e => setForm(f=>({...f,notes:e.target.value}))} placeholder="Optional…" className="w-full bg-white/[0.04] border border-white/[0.07] rounded px-3 py-2 text-sm text-white placeholder-[#555] focus:outline-none focus:border-red-700" />
+              <label className="label">Notes</label>
+              <input value={form.notes} onChange={e => setForm(f=>({...f,notes:e.target.value}))} placeholder="Optional…" className="input-field" />
             </div>
-            <button type="submit" disabled={addMut.isPending} className="w-full flex items-center justify-center gap-2 bg-[#c0392b] hover:bg-[#e74c3c] text-white py-2.5 rounded text-sm font-semibold tracking-wide transition-all disabled:opacity-50">
-              <Plus size={14} /> {addMut.isPending ? "Adding…" : "Add Entry"}
+            <button type="submit" disabled={addMut.isPending} className="btn-primary w-full">
+              <Plus size={15} /> {addMut.isPending ? "Adding…" : "Add Entry"}
             </button>
           </form>
         </div>
 
         {/* Transaction History */}
-        <div className="lg:col-span-2 bg-[rgba(15,15,15,0.92)] border border-white/[0.07] rounded-lg overflow-hidden">
-          <div className="p-4 border-b border-white/[0.07]">
-            <div className="font-display text-lg tracking-[2px] text-white">TRANSACTION <span className="text-[#e74c3c]">HISTORY</span></div>
+        <div className="lg:col-span-2 table-container flex flex-col">
+          <div className="px-5 py-4 border-b border-gray-100 dark:border-slate-700">
+            <h2 className="section-title">Transaction History</h2>
           </div>
-          <div className="overflow-y-auto max-h-[400px]">
+          <div className="overflow-y-auto max-h-[480px] flex-1">
             {sortedDates.length === 0 ? (
-              <div className="text-center py-12 text-[#555] text-xs">No entries for {MONTHS[month]} {year}</div>
+              <div className="flex items-center justify-center py-16 text-gray-400 dark:text-slate-500 text-sm">
+                No entries for {MONTHS[month]} {year}
+              </div>
             ) : sortedDates.map(date => (
-              <div key={date} className="border-b border-white/[0.03]">
-                <div className="px-4 py-2 bg-white/[0.02] text-[10px] text-[#555] uppercase tracking-widest font-semibold">{date}</div>
+              <div key={date}>
+                <div className="px-5 py-2 bg-gray-50 dark:bg-slate-900/30 text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider border-b border-gray-100 dark:border-slate-700/50">
+                  {date}
+                </div>
                 {byDate[date].map(e => (
-                  <div key={e.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/[0.02] transition-colors">
-                    <div className={`w-1.5 h-8 rounded-full flex-shrink-0 ${e.type === "profit" ? "bg-[#27ae60]" : "bg-[#e74c3c]"}`} />
+                  <div key={e.id} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 dark:hover:bg-slate-700/30 border-b border-gray-100 dark:border-slate-700/30 transition-colors">
+                    <div className={`w-1 h-8 rounded-full flex-shrink-0 ${e.type === "profit" ? "bg-emerald-500" : "bg-red-500"}`} />
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] uppercase tracking-widest text-[#888]">{e.category}</span>
-                      </div>
-                      <div className="text-[11px] text-[#555] truncate">{e.notes || "No notes"}</div>
+                      <span className={`text-xs font-medium ${e.type === "profit" ? "badge-green" : "badge-red"}`}>{e.category}</span>
+                      <div className="text-xs text-gray-400 dark:text-slate-500 mt-0.5 truncate">{e.notes || "No notes"}</div>
                     </div>
-                    <div className={`font-mono-num text-sm font-semibold ${e.type === "profit" ? "text-[#27ae60]" : "text-[#e74c3c]"}`}>
+                    <div className={`font-mono text-sm font-semibold flex-shrink-0 ${e.type === "profit" ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"}`}>
                       {e.type === "profit" ? "+" : "-"}₱{fmt(e.amount)}
                     </div>
-                    <button onClick={() => { if(confirm("Delete this entry?")) delMut.mutate(e.id); }} className="text-[#555] hover:text-[#e74c3c] transition-colors flex-shrink-0">
-                      <Trash2 size={12} />
+                    <button onClick={() => { if(confirm("Delete this entry?")) delMut.mutate(e.id); }} className="text-gray-300 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 transition-colors flex-shrink-0 ml-1">
+                      <Trash2 size={13} />
                     </button>
                   </div>
                 ))}
@@ -183,16 +209,16 @@ export default function SalaryPage() {
       </div>
 
       {/* Monthly Spreadsheet */}
-      <div className="bg-[rgba(15,15,15,0.92)] border border-white/[0.07] rounded-lg overflow-hidden">
-        <div className="p-4 border-b border-white/[0.07] flex items-center justify-between">
-          <div className="font-display text-lg tracking-[2px] text-white">MONTHLY <span className="text-[#e74c3c]">SPREADSHEET</span> — {MONTHS[month].toUpperCase()} {year}</div>
+      <div className="table-container">
+        <div className="px-5 py-4 border-b border-gray-100 dark:border-slate-700 flex items-center justify-between">
+          <h2 className="section-title">Monthly Spreadsheet — {MONTHS[month]} {year}</h2>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-xs">
+          <table className="w-full border-collapse">
             <thead>
               <tr>
                 {["Day","Date","Profit","Expense","Net","Notes"].map(h => (
-                  <th key={h} className="bg-[rgba(10,10,10,0.9)] text-[#888] text-[10px] font-semibold uppercase tracking-[1.2px] px-4 py-2.5 border-b border-white/[0.07] text-left sticky top-0">{h}</th>
+                  <th key={h} className="th">{h}</th>
                 ))}
               </tr>
             </thead>
@@ -203,21 +229,28 @@ export default function SalaryPage() {
                 const net = profit - expense;
                 const isToday = ds === new Date().toISOString().slice(0,10);
                 return (
-                  <tr key={ds} className={`border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors ${isToday ? "bg-white/[0.03]" : ""}`}>
-                    <td className="px-4 py-2 font-display text-lg text-[#555]">{String(day).padStart(2,"0")}</td>
-                    <td className="px-4 py-2 text-[#888] text-[11px]">{new Date(ds+"T00:00:00").toLocaleDateString("en-PH",{weekday:"short",month:"short",day:"numeric"})}</td>
-                    <td className="px-4 py-2 font-mono-num font-semibold text-[#27ae60]">{profit > 0 ? `+₱${fmt(profit)}` : "—"}</td>
-                    <td className="px-4 py-2 font-mono-num font-semibold text-[#e74c3c]">{expense > 0 ? `-₱${fmt(expense)}` : "—"}</td>
-                    <td className={`px-4 py-2 font-mono-num font-semibold ${net > 0 ? "text-[#27ae60]" : net < 0 ? "text-[#e74c3c]" : "text-[#555]"}`}>{net !== 0 ? `${net>0?"+":""}₱${fmt(net)}` : "—"}</td>
-                    <td className="px-4 py-2 text-[#555] text-[11px] max-w-[160px] truncate">{dayEntries.map(e=>e.notes).filter(Boolean).join(", ") || "—"}</td>
+                  <tr key={ds} className={`tr-hover ${isToday ? "bg-emerald-50/50 dark:bg-emerald-900/10" : ""}`}>
+                    <td className="td font-bold text-gray-400 dark:text-slate-500 w-12">{String(day).padStart(2,"0")}</td>
+                    <td className="td text-gray-500 dark:text-slate-400">
+                      {new Date(ds+"T00:00:00").toLocaleDateString("en-PH",{weekday:"short",month:"short",day:"numeric"})}
+                      {isToday && <span className="ml-2 badge-green text-[10px]">Today</span>}
+                    </td>
+                    <td className="td font-mono font-semibold text-emerald-600 dark:text-emerald-400">{profit > 0 ? `+₱${fmt(profit)}` : "—"}</td>
+                    <td className="td font-mono font-semibold text-red-500 dark:text-red-400">{expense > 0 ? `-₱${fmt(expense)}` : "—"}</td>
+                    <td className={`td font-mono font-semibold ${net > 0 ? "text-emerald-600 dark:text-emerald-400" : net < 0 ? "text-red-500 dark:text-red-400" : "text-gray-400 dark:text-slate-500"}`}>
+                      {net !== 0 ? `${net>0?"+":""}₱${fmt(net)}` : "—"}
+                    </td>
+                    <td className="td text-gray-400 dark:text-slate-500 max-w-[160px] truncate">{dayEntries.map(e=>e.notes).filter(Boolean).join(", ") || "—"}</td>
                   </tr>
                 );
               })}
-              <tr className="border-t-2 border-white/[0.1] bg-white/[0.03]">
-                <td colSpan={2} className="px-4 py-3 font-semibold text-white text-xs uppercase tracking-widest">TOTAL</td>
-                <td className="px-4 py-3 font-mono-num font-bold text-[#27ae60]">+₱{fmt(totalProfit)}</td>
-                <td className="px-4 py-3 font-mono-num font-bold text-[#e74c3c]">-₱{fmt(totalExpense)}</td>
-                <td className={`px-4 py-3 font-mono-num font-bold ${netIncome >= 0 ? "text-[#27ae60]" : "text-[#e74c3c]"}`}>{netIncome >= 0 ? "+" : ""}₱{fmt(netIncome)}</td>
+              <tr className="bg-gray-50 dark:bg-slate-900/50 border-t-2 border-gray-200 dark:border-slate-600">
+                <td colSpan={2} className="px-4 py-3 text-xs font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wider">Total</td>
+                <td className="px-4 py-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">+₱{fmt(totalProfit)}</td>
+                <td className="px-4 py-3 font-mono font-bold text-red-500 dark:text-red-400">-₱{fmt(totalExpense)}</td>
+                <td className={`px-4 py-3 font-mono font-bold ${netIncome >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"}`}>
+                  {netIncome >= 0 ? "+" : ""}₱{fmt(netIncome)}
+                </td>
                 <td className="px-4 py-3" />
               </tr>
             </tbody>

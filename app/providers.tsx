@@ -12,11 +12,23 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <SessionProvider>
       <QueryClientProvider client={qc}>
         {children}
-        <Toaster position="bottom-right" toastOptions={{
-          style: { background: "#111", color: "#f0f0f0", border: "1px solid rgba(255,255,255,0.07)", borderLeft: "3px solid #c0392b" },
-          success: { style: { borderLeft: "3px solid #27ae60" } },
-          error: { style: { borderLeft: "3px solid #e74c3c" } },
-        }} />
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            style: {
+              background: "#fff",
+              color: "#111827",
+              border: "1px solid #E5E7EB",
+              borderRadius: "12px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              fontSize: "14px",
+              fontFamily: "Inter, sans-serif",
+            },
+            success: { iconTheme: { primary: "#10B981", secondary: "#fff" } },
+            error: { iconTheme: { primary: "#EF4444", secondary: "#fff" } },
+            duration: 3000,
+          }}
+        />
       </QueryClientProvider>
     </SessionProvider>
   );
