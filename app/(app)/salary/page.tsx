@@ -42,9 +42,19 @@ export default function SalaryPage() {
   });
 
   const addMut = useMutation({
-    mutationFn: (data: any) => fetch("/api/salary", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(data) }).then(r => r.json()),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["salary"] }); qc.invalidateQueries({ queryKey: ["dashboard"] }); toast.success("Entry added!"); setForm(f => ({...f, amount: "", notes: ""})); },
-    onError: () => toast.error("Failed to add entry."),
+    mutationFn: async (data: any) => {
+      const res = await fetch("/api/salary", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(data) });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || "Failed to add entry");
+      return body;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["salary"] });
+      qc.invalidateQueries({ queryKey: ["dashboard"] });
+      toast.success("Entry added!");
+      setForm(f => ({...f, amount: "", notes: ""}));
+    },
+    onError: (e: any) => toast.error(e?.message || "Failed to add entry."),
   });
 
   const delMut = useMutation({
