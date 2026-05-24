@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
 
   const entries = await prisma.salaryEntry.findMany({
     where,
-    orderBy: [{ date: "asc" }, { createdAt: "asc" }],
+    orderBy: [{ date: "desc" }, { createdAt: "desc" }],
   });
   return NextResponse.json(entries);
 }
