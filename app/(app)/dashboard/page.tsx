@@ -1,8 +1,8 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { Plus, Minus, RefreshCw, Edit2, Trash2, Archive, Copy, ChevronLeft, ChevronRight, TrendingUp, TrendingDown, X } from "lucide-react";
+import { Plus, Minus, RefreshCw, Edit2, Trash2, Archive, Copy, ChevronLeft, ChevronRight, X, Download } from "lucide-react";
 import { fmt, ACCOUNT_COLORS, MONTHS } from "@/lib/utils";
 
 type Account = {
@@ -49,6 +49,7 @@ export default function DashboardPage() {
   const [showModal, setShowModal] = useState(false); const [editId, setEditId] = useState<string | null>(null);
   const [txSearch, setTxSearch] = useState(""); const [txType, setTxType] = useState(""); const [txDate, setTxDate] = useState(""); const [txPage, setTxPage] = useState(1);
   const [amtInputs, setAmtInputs] = useState<Record<string, string>>({});
+  const [noteInputs, setNoteInputs] = useState<Record<string, string>>({});
   const [form, setForm] = useState({ model: "", phone: "", balance: "", limit: "100000", category: "Personal", color: "#10B981", notes: "" });
   const [selectedColor, setSelectedColor] = useState("#10B981");
 
@@ -110,11 +111,37 @@ export default function DashboardPage() {
   function openAdd() { setEditId(null); setForm({ model: "", phone: "", balance: "", limit: "100000", category: "Personal", color: "#10B981", notes: "" }); setSelectedColor("#10B981"); setShowModal(true); }
   function openEdit(a: Account) { setEditId(a.id); setForm({ model: a.model, phone: a.phone, balance: String(a.balance), limit: String(a.limit), category: a.category, color: a.color, notes: a.notes || "" }); setSelectedColor(a.color); setShowModal(true); }
   function handleSave(e: React.FormEvent) { e.preventDefault(); saveMut.mutate({ model: form.model, phone: form.phone, balance: parseFloat(form.balance) || 0, limit: parseFloat(form.limit) || 100000, category: form.category, color: selectedColor, notes: form.notes, archived: false }); }
+
   function handleTx(accountId: string, type: string) {
     const amt = parseFloat(amtInputs[accountId] || "0");
     if (type !== "Reset" && (!amt || amt <= 0)) { toast.error("Enter a valid amount."); return; }
-    txMut.mutate({ accountId, type, amount: amt, notes: "" });
+    txMut.mutate({ accountId, type, amount: amt, notes: noteInputs[accountId] || "" });
     setAmtInputs(prev => ({ ...prev, [accountId]: "" }));
+    setNoteInputs(prev => ({ ...prev, [accountId]: "" }));
+  }
+
+  function copyPhone(phone: string) {
+    navigator.clipboard.writeText(phone).then(() => toast.success("Phone number copied!"));
+  }
+
+  async function exportTxCSV() {
+    const res = await fetch(`/api/transactions?search=${txSearch}&type=${txType}&date=${txDate}&page=1&perPage=10000`);
+    const data = await res.json();
+    const rows = [["TX ID", "Date", "Time", "Type", "Phone", "Account", "Category", "Amount", "Bal After", "Notes", "Status"]];
+    (data.transactions || []).forEach((t: Tx) => {
+      const d = new Date(t.createdAt);
+      rows.push([
+        t.id.slice(-8),
+        d.toLocaleDateString("en-PH"),
+        d.toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit" }),
+        t.type, t.phone, t.account, t.category,
+        String(t.amount), String(t.balAfter),
+        t.notes || "", t.status,
+      ]);
+    });
+    const csv = rows.map(r => r.map(c => `"${c}"`).join(",")).join("\n");
+    const a = document.createElement("a"); a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv); a.download = "transactions.csv"; a.click();
+    toast.success("CSV exported.");
   }
 
   const getStatus = (a: Account) => {
@@ -124,6 +151,8 @@ export default function DashboardPage() {
     if (pct >= 75) return { label: "High", cls: "badge-yellow" };
     return { label: "Active", cls: "badge-green" };
   };
+
+  const hasFilters = !!(txSearch || txType || txDate);
 
   return (
     <div className="space-y-6">
@@ -159,8 +188,7 @@ export default function DashboardPage() {
 
         {/* Filters */}
         <div className="flex flex-wrap gap-2 mb-3">
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search accounts…"
-            className="input-field !w-44 !py-2" />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search accounts…" className="input-field !w-44 !py-2" />
           <select value={catFilter} onChange={e => setCatFilter(e.target.value)} className="select-field !w-auto !py-2">
             <option value="">All Categories</option>{CATS.map(c => <option key={c}>{c}</option>)}
           </select>
@@ -175,14 +203,14 @@ export default function DashboardPage() {
             <table className="w-full border-collapse text-sm">
               <thead className="sticky top-0 z-10">
                 <tr>
-                  {["#", "Model", "Phone", "Category", "Used", "Limit", "Available", "Usage", "Status", "Amount", "Notes", "Actions"].map(h => (
+                  {["#", "Model", "Phone", "Category", "Used", "Limit", "Available", "Usage", "Status", "Amount", "Tx Notes", "Acc Notes", "Actions"].map(h => (
                     <th key={h} className="th whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {accounts.length === 0 ? (
-                  <tr><td colSpan={12} className="text-center py-14 text-gray-400 dark:text-[#B0B3B8]">
+                  <tr><td colSpan={13} className="text-center py-14 text-gray-400 dark:text-[#B0B3B8]">
                     <div className="text-3xl mb-2">📱</div>
                     <div className="text-sm">No accounts yet. Add your first GCash account.</div>
                   </td></tr>
@@ -199,7 +227,14 @@ export default function DashboardPage() {
                           <span className="font-medium text-gray-900 dark:text-[#E4E6EB]">{a.model}</span>
                         </div>
                       </td>
-                      <td className="td font-mono text-xs text-gray-500 dark:text-[#B0B3B8]">{a.phone}</td>
+                      <td className="td font-mono text-xs text-gray-500 dark:text-[#B0B3B8]">
+                        <div className="flex items-center gap-1">
+                          {a.phone}
+                          <button onClick={() => copyPhone(a.phone)} title="Copy phone" className="text-gray-300 dark:text-slate-600 hover:text-blue-500 dark:hover:text-blue-400 transition-colors">
+                            <Copy size={11} />
+                          </button>
+                        </div>
+                      </td>
                       <td className="td"><span className="badge-gray">{a.category}</span></td>
                       <td className="td font-mono text-emerald-600 dark:text-emerald-400">₱{fmt(a.used)}</td>
                       <td className="td font-mono text-gray-500 dark:text-[#B0B3B8]">₱{fmt(a.limit)}</td>
@@ -211,6 +246,11 @@ export default function DashboardPage() {
                           onChange={e => setAmtInputs(p => ({ ...p, [a.id]: e.target.value }))}
                           className="w-24 bg-gray-50 dark:bg-[#3A3B3C] border border-gray-200 dark:border-[#3E4042] rounded-lg px-2 py-1.5 text-xs text-right focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono" />
                       </td>
+                      <td className="td">
+                        <input type="text" placeholder="Note…" value={noteInputs[a.id] || ""}
+                          onChange={e => setNoteInputs(p => ({ ...p, [a.id]: e.target.value }))}
+                          className="w-28 bg-gray-50 dark:bg-[#3A3B3C] border border-gray-200 dark:border-[#3E4042] rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                      </td>
                       <td className="td text-xs text-gray-400 dark:text-[#B0B3B8] max-w-[90px] truncate">{a.notes || "—"}</td>
                       <td className="td">
                         <div className="flex items-center gap-1">
@@ -218,7 +258,7 @@ export default function DashboardPage() {
                           <button onClick={() => handleTx(a.id, "Deduct")} title="Deduct" className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-[#3A3B3C] hover:bg-gray-200 dark:hover:bg-[#3A3B3C] text-gray-600 dark:text-[#E4E6EB] flex items-center justify-center transition-colors"><Minus size={11} /></button>
                           <button onClick={() => handleTx(a.id, "Reset")} title="Reset" className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-[#3A3B3C] hover:bg-gray-200 dark:hover:bg-[#3A3B3C] text-gray-500 dark:text-[#B0B3B8] flex items-center justify-center transition-colors"><RefreshCw size={11} /></button>
                           <button onClick={() => openEdit(a)} title="Edit" className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center transition-colors"><Edit2 size={11} /></button>
-                          <button onClick={() => archMut.mutate({ id: a.id, archived: !a.archived })} title="Archive" className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-[#3A3B3C] hover:bg-gray-200 dark:hover:bg-[#3A3B3C] text-gray-500 flex items-center justify-center transition-colors"><Archive size={11} /></button>
+                          <button onClick={() => archMut.mutate({ id: a.id, archived: !a.archived })} title={a.archived ? "Unarchive" : "Archive"} className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-[#3A3B3C] hover:bg-gray-200 dark:hover:bg-[#3A3B3C] text-gray-500 flex items-center justify-center transition-colors"><Archive size={11} /></button>
                           <button onClick={() => { if (confirm("Delete this account?")) delMut.mutate(a.id); }} title="Delete" className="w-7 h-7 rounded-lg bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 text-red-500 flex items-center justify-center transition-colors"><Trash2 size={11} /></button>
                         </div>
                       </td>
@@ -236,8 +276,15 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between mb-3">
           <div>
             <h2 className="section-title">Transaction History</h2>
-            <p className="text-xs text-gray-400 dark:text-[#B0B3B8] mt-0.5">All account activity</p>
+            <p className="text-xs text-gray-400 dark:text-[#B0B3B8] mt-0.5">
+              {hasFilters && txData?.total != null
+                ? `${txData.total} result${txData.total !== 1 ? "s" : ""} found`
+                : "All account activity"}
+            </p>
           </div>
+          <button onClick={exportTxCSV} className="btn-secondary gap-1.5 text-xs">
+            <Download size={13} /> Export CSV
+          </button>
         </div>
         <div className="flex flex-wrap gap-2 mb-3">
           <input value={txSearch} onChange={e => { setTxSearch(e.target.value); setTxPage(1); }} placeholder="Search transactions…" className="input-field !w-44 !py-2" />
@@ -245,8 +292,7 @@ export default function DashboardPage() {
             <option value="">All Types</option>{["Add", "Deduct", "Reset"].map(t => <option key={t}>{t}</option>)}
           </select>
           <input type="date" value={txDate} onChange={e => { setTxDate(e.target.value); setTxPage(1); }} className="input-field !w-auto !py-2" />
-          <button onClick={() => { setTxSearch(""); setTxType(""); setTxDate(""); setTxPage(1); }}
-            className="btn-ghost text-xs py-2">Clear</button>
+          <button onClick={() => { setTxSearch(""); setTxType(""); setTxDate(""); setTxPage(1); }} className="btn-ghost text-xs py-2">Clear</button>
         </div>
 
         <div className="table-container">
