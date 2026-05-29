@@ -50,6 +50,7 @@ export default function SalaryPage() {
   const totalProfit = entries.filter(e => e.type === "profit").reduce((s, e) => s + e.amount, 0);
   const totalExpense = entries.filter(e => e.type === "expense").reduce((s, e) => s + e.amount, 0);
   const netIncome = totalProfit - totalExpense;
+  const todayProfit = entries.filter(e => e.type === "profit" && e.date === todayStr()).reduce((s, e) => s + e.amount, 0);
 
   const byDate: Record<string, Entry[]> = {};
   entries.forEach(e => { byDate[e.date] = [...(byDate[e.date] || []), e]; });
@@ -94,7 +95,7 @@ export default function SalaryPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="stat-card">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-medium text-gray-500 dark:text-[#B0B3B8] uppercase tracking-wider">Total Profit</span>
@@ -123,6 +124,16 @@ export default function SalaryPage() {
           <div className={`text-2xl font-medium ${netIncome >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"}`}>
             {netIncome >= 0 ? "+" : ""}₱{fmt(netIncome)}
           </div>
+        </div>
+        <div className="stat-card">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-medium text-gray-500 dark:text-[#B0B3B8] uppercase tracking-wider">Profit Today</span>
+            <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
+              <TrendingUp size={15} className="text-blue-600 dark:text-blue-400" />
+            </div>
+          </div>
+          <div className="text-2xl font-medium text-blue-600 dark:text-blue-400">₱{fmt(todayProfit)}</div>
+          <div className="mt-1 text-xs text-gray-400 dark:text-[#B0B3B8]">Resets tomorrow</div>
         </div>
       </div>
 
