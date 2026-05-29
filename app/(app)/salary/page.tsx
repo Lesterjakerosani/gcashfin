@@ -187,11 +187,18 @@ export default function SalaryPage() {
                 <div className="px-5 py-2 bg-gray-50 dark:bg-[#18191A]/30 text-xs font-semibold text-gray-500 dark:text-[#B0B3B8] uppercase tracking-wider border-b border-gray-100 dark:border-[#3E4042]/50">
                   {date}
                 </div>
-                {byDate[date].map(e => (
+                {byDate[date].map(e => {
+                  const created = new Date(e.createdAt);
+                  const timeStr = created.toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit", hour12: true });
+                  const dateStr = created.toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" });
+                  return (
                   <div key={e.id} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 dark:hover:bg-[#3A3B3C]/30 border-b border-gray-100 dark:border-[#3E4042]/30 transition-colors">
                     <div className={`w-1 h-8 rounded-full flex-shrink-0 ${e.type === "profit" ? "bg-emerald-500" : "bg-red-500"}`} />
                     <div className="flex-1 min-w-0">
-                      <span className={`text-xs font-medium ${e.type === "profit" ? "badge-green" : "badge-red"}`}>{e.category}</span>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`text-xs font-medium ${e.type === "profit" ? "badge-green" : "badge-red"}`}>{e.category}</span>
+                        <span className="text-[10px] text-gray-400 dark:text-[#B0B3B8] font-mono">{dateStr} · {timeStr}</span>
+                      </div>
                       <div className="text-xs text-gray-400 dark:text-[#B0B3B8] mt-0.5 truncate">{e.notes || "No notes"}</div>
                     </div>
                     <div className={`font-mono text-sm flex-shrink-0 ${e.type === "profit" ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"}`}>
@@ -201,7 +208,8 @@ export default function SalaryPage() {
                       <Trash2 size={13} />
                     </button>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             ))}
           </div>
