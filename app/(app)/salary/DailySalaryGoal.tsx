@@ -22,13 +22,11 @@ function GokuGif({ mode }: { mode: "celebrate" | "encourage" | "sad" }) {
     ? "OHlZNhjkvEXLnBjezC" // Sad Goku
     : "9G92we0pqre8M";     // Thumbs up / encouraging
   return (
-    <div className={`relative flex items-center justify-center ${mode === "celebrate" ? "animate-goku-celebrate" : "animate-goku-encourage"}`}>
-      {/* Aura glow behind gif */}
-      <div className={`absolute inset-0 rounded-full blur-2xl opacity-50 animate-pulse ${mode === "celebrate" ? "bg-yellow-400" : mode === "sad" ? "bg-gray-400" : "bg-blue-400"}`} style={{ transform: "scale(1.4)" }} />
+    <div className={`flex items-center justify-center ${mode === "celebrate" ? "animate-goku-celebrate" : "animate-goku-encourage"}`}>
       <img
         src={`https://media.giphy.com/media/${gifId}/giphy.gif`}
         alt={mode === "celebrate" ? "Goku Super Saiyan celebrating" : mode === "sad" ? "Goku sad" : "Goku thumbs up"}
-        className="relative z-10 w-28 h-28 object-contain drop-shadow-2xl"
+        className="w-44 h-44 object-contain drop-shadow-2xl"
       />
     </div>
   );

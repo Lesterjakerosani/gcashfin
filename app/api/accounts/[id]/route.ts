@@ -42,9 +42,6 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const userId = (session.user as any).id;
-  await prisma.$transaction([
-    prisma.transaction.deleteMany({ where: { accountId: params.id, userId } }),
-    prisma.account.deleteMany({ where: { id: params.id, userId } }),
-  ]);
+  await prisma.account.deleteMany({ where: { id: params.id, userId } });
   return NextResponse.json({ ok: true });
 }
