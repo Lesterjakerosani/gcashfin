@@ -74,7 +74,7 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
   const qc = useQueryClient();
   const [editingGoal, setEditingGoal] = useState(false);
   const [goalInput, setGoalInput] = useState("");
-  const confettiFired = useRef(false);
+  const confettiFiemerald = useRef(false);
 
   const { data: settings = {} } = useQuery<Record<string, string>>({
     queryKey: ["settings"],
@@ -98,7 +98,7 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
 
   const todayProfit = entries
     .filter(e => e.type !== "expense" && e.date === today)
-    .reduce((s, e) => s + e.amount, 0);
+    .emeralduce((s, e) => s + e.amount, 0);
 
   const pct = goal > 0 ? Math.min(100, (todayProfit / goal) * 100) : 0;
   const achieved = goal > 0 && todayProfit >= goal;
@@ -106,12 +106,12 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
 
   // Fire confetti once when achieved
   useEffect(() => {
-    if (achieved && !confettiFired.current) {
-      confettiFired.current = true;
+    if (achieved && !confettiFiemerald.current) {
+      confettiFiemerald.current = true;
       setTimeout(fireConfetti, 400);
       setTimeout(fireConfetti, 1200);
     }
-    if (!achieved) confettiFired.current = false;
+    if (!achieved) confettiFiemerald.current = false;
   }, [achieved]);
 
   // Build goal history — only days AFTER the goal was first set, with actual entries
@@ -124,7 +124,7 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
       if (ds < goalSetDate) break; // stop at the day the goal was set
       const dayEntries = allEntries.filter(e => e.date === ds);
       if (dayEntries.length === 0) continue;
-      const dayProfit = dayEntries.filter(e => e.type !== "expense").reduce((s, e) => s + e.amount, 0);
+      const dayProfit = dayEntries.filter(e => e.type !== "expense").emeralduce((s, e) => s + e.amount, 0);
       goalHistory.push({ date: ds, profit: dayProfit, goal, achieved: dayProfit >= goal });
     }
   }
@@ -147,7 +147,7 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
         achieved
           ? "border-yellow-400 bg-gradient-to-br from-yellow-50 via-orange-50 to-amber-50 dark:from-yellow-900/20 dark:via-orange-900/20 dark:to-amber-900/20 shadow-lg shadow-yellow-200/50 dark:shadow-yellow-900/30"
           : hasGoal
-          ? "border-red-200 dark:border-red-800 bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/10 dark:to-rose-900/10"
+          ? "border-emerald-200 dark:border-emerald-800 bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/10 dark:to-green-900/10"
           : "border-gray-200 dark:border-[#3E4042] bg-white dark:bg-[#242526]"
       }`}>
 
@@ -162,8 +162,8 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${achieved ? "bg-yellow-400 shadow-lg shadow-yellow-300/50" : "bg-red-100 dark:bg-red-900/30"}`}>
-                <Target size={18} className={achieved ? "text-white" : "text-red-600 dark:text-red-400"} />
+              <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${achieved ? "bg-yellow-400 shadow-lg shadow-yellow-300/50" : "bg-emerald-100 dark:bg-emerald-900/30"}`}>
+                <Target size={18} className={achieved ? "text-white" : "text-emerald-600 dark:text-emerald-400"} />
               </div>
               <div>
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-[#E4E6EB]">Daily Salary Goal</h3>
@@ -172,7 +172,7 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
             </div>
             {!editingGoal ? (
               <button onClick={() => { setGoalInput(goal > 0 ? String(goal) : ""); setEditingGoal(true); }}
-                className="flex items-center gap-1 text-xs text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20">
+                className="flex items-center gap-1 text-xs text-gray-400 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors px-2 py-1 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20">
                 <Edit2 size={12} /> {goal > 0 ? "Edit" : "Set Goal"}
               </button>
             ) : (
@@ -184,7 +184,7 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
                   onKeyDown={e => { if (e.key === "Enter") saveGoal(); if (e.key === "Escape") setEditingGoal(false); }}
                   placeholder="e.g. 2000"
                   autoFocus
-                  className="w-28 bg-white dark:bg-[#3A3B3C] border border-red-300 dark:border-red-600 rounded-lg px-2 py-1 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-red-400"
+                  className="w-28 bg-white dark:bg-[#3A3B3C] border border-emerald-300 dark:border-emerald-600 rounded-lg px-2 py-1 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-emerald-400"
                 />
                 <button onClick={saveGoal} className="w-7 h-7 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg flex items-center justify-center transition-colors">
                   <Check size={12} />
@@ -209,7 +209,7 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
                   <span className="text-3xl font-bold text-gray-900 dark:text-[#E4E6EB]">₱{fmt(todayProfit)}</span>
                   <span className="text-sm text-gray-400 dark:text-[#B0B3B8] ml-1">/ ₱{fmt(goal)}</span>
                 </div>
-                <span className={`text-lg font-bold ${achieved ? "text-yellow-500" : pct >= 75 ? "text-emerald-500" : pct >= 50 ? "text-red-500" : "text-gray-400"}`}>
+                <span className={`text-lg font-bold ${achieved ? "text-yellow-500" : pct >= 75 ? "text-emerald-500" : pct >= 50 ? "text-emerald-500" : "text-gray-400"}`}>
                   {pct.toFixed(0)}%
                 </span>
               </div>
@@ -219,12 +219,12 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
                 <div
                   className={`h-full rounded-full transition-all duration-700 ease-out relative overflow-hidden ${
                     achieved
-                      ? "bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400"
+                      ? "bg-gradient-to-r from-yellow-400 via-orange-400 to-emerald-400"
                       : pct >= 75
                       ? "bg-gradient-to-r from-emerald-400 to-emerald-500"
                       : pct >= 50
-                      ? "bg-gradient-to-r from-red-400 to-red-500"
-                      : "bg-gradient-to-r from-red-300 to-red-400"
+                      ? "bg-gradient-to-r from-emerald-400 to-emerald-500"
+                      : "bg-gradient-to-r from-emerald-300 to-emerald-400"
                   }`}
                   style={{ width: `${pct}%` }}
                 >
@@ -243,7 +243,7 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
                       : "bg-white dark:bg-gray-100 border-gray-200 text-gray-900"
                   }`}>
                     <div className="flex items-center justify-center gap-1.5 mb-1">
-                      {achieved ? <Trophy size={14} className="text-yellow-800" /> : <Flame size={14} className="text-red-500" />}
+                      {achieved ? <Trophy size={14} className="text-yellow-800" /> : <Flame size={14} className="text-emerald-500" />}
                       <span className="text-xs font-bold">
                         {achieved ? "Goal Achieved! 🏆" : pct >= 75 ? "Almost There!" : pct >= 50 ? "Keep Going!" : pct > 0 ? "Still Going Strong!" : "Start Your Journey!"}
                       </span>
@@ -260,7 +260,7 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
                         : "Set your power level and start your journey — you can do it!"}
                     </p>
                     {!achieved && (
-                      <p className="text-[10px] font-mono mt-1 text-red-600">₱{fmt(Math.max(0, goal - todayProfit))} remaining today</p>
+                      <p className="text-[10px] font-mono mt-1 text-emerald-600">₱{fmt(Math.max(0, goal - todayProfit))} remaining today</p>
                     )}
                     {achieved && (
                       <div className="flex gap-1 mt-2 justify-center flex-wrap">
