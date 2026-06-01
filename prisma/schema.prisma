@@ -43,7 +43,7 @@ model Account {
 model Transaction {
   id        String   @id @default(cuid())
   userId    String
-  accountId String
+  accountId String?
   type      String
   amount    Float
   balAfter  Float    @default(0)
@@ -54,7 +54,7 @@ model Transaction {
   status    String   @default("Completed")
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  acct      Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  acct      Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
 }
 
 model SalaryEntry {
