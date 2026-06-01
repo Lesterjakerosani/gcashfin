@@ -16,14 +16,14 @@ interface GoalHistoryItem {
 
 /* ── Real Goku GIF character ── */
 function GokuGif({ mode }: { mode: "celebrate" | "encourage" }) {
-  const gifId = mode === "celebrate" ? "B6SyssSlTgPXq" : "9G92we0pqre8M";
+  const gifId = mode === "celebrate" ? "B6SyssSlTgPXq" : "OHlZNhjkvEXLnBjezC";
   return (
     <div className={`relative flex items-center justify-center ${mode === "celebrate" ? "animate-goku-celebrate" : "animate-goku-encourage"}`}>
       {/* Aura glow behind gif */}
-      <div className={`absolute inset-0 rounded-full blur-2xl opacity-50 ${mode === "celebrate" ? "bg-yellow-400 animate-pulse" : "bg-blue-400 animate-pulse"}`} style={{ transform: "scale(1.4)" }} />
+      <div className={`absolute inset-0 rounded-full blur-2xl opacity-50 ${mode === "celebrate" ? "bg-yellow-400 animate-pulse" : "bg-gray-400 animate-pulse"}`} style={{ transform: "scale(1.4)" }} />
       <img
         src={`https://media.giphy.com/media/${gifId}/giphy.gif`}
-        alt={mode === "celebrate" ? "Goku Super Saiyan celebrating" : "Goku thumbs up encouraging"}
+        alt={mode === "celebrate" ? "Goku Super Saiyan celebrating" : "Goku sad"}
         className="relative z-10 w-28 h-28 object-contain drop-shadow-2xl"
         unoptimized="true"
       />
@@ -246,16 +246,18 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center gap-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-4 border border-blue-200 dark:border-blue-800">
+                <div className="flex items-center gap-4 bg-gradient-to-r from-gray-50 to-slate-50 dark:from-gray-900/20 dark:to-slate-900/20 rounded-2xl p-4 border border-gray-200 dark:border-gray-700">
                   <div className="flex-shrink-0">
                     <GokuGif mode="encourage" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <Flame size={16} className="text-blue-500" />
-                      <span className="text-sm font-bold text-blue-700 dark:text-blue-400">Keep Fighting!</span>
+                      <Flame size={16} className="text-gray-500" />
+                      <span className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                        {pct >= 75 ? "So Close!" : pct >= 50 ? "Keep Going!" : pct > 0 ? "Don't Give Up!" : "Start Your Journey!"}
+                      </span>
                     </div>
-                    <p className="text-xs font-medium text-blue-800 dark:text-blue-300 leading-relaxed">
+                    <p className="text-xs font-medium text-gray-600 dark:text-gray-400 leading-relaxed">
                       {pct >= 75
                         ? "Almost there! You're so close — give it everything you've got!"
                         : pct >= 50
@@ -265,7 +267,7 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
                         : "Your journey begins now! Set your power level and surpass your limits!"}
                     </p>
                     <div className="mt-2 flex items-center gap-2">
-                      <span className="text-[10px] text-blue-500 dark:text-blue-400 font-mono">₱{fmt(Math.max(0, goal - todayProfit))} remaining</span>
+                      <span className="text-[10px] text-gray-500 dark:text-gray-400 font-mono">₱{fmt(Math.max(0, goal - todayProfit))} remaining</span>
                     </div>
                   </div>
                 </div>
