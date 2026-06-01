@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { Plus, Trash2, Download, TrendingUp, TrendingDown, DollarSign, Edit2, X } from "lucide-react";
 import { fmt, MSHORT, MONTHS, todayStr } from "@/lib/utils";
+import DailySalaryGoal from "./DailySalaryGoal";
 
 type Entry = { id: string; date: string; type: string; amount: number; category: string; notes?: string; createdAt: string; };
 
@@ -166,6 +167,9 @@ export default function SalaryPage() {
           <div className="mt-1 text-xs text-gray-400 dark:text-[#B0B3B8]">Resets tomorrow</div>
         </div>
       </div>
+
+      {/* Daily Salary Goal */}
+      <DailySalaryGoal entries={entries} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Add Entry Form */}

@@ -118,3 +118,27 @@
 
 /* Recharts tooltip */
 .recharts-tooltip-wrapper { z-index: 50; }
+
+/* Daily Salary Goal animations */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+@keyframes float-star {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  50% { transform: translateY(-20px) rotate(180deg); opacity: 0.5; }
+}
+@keyframes goku-celebrate {
+  0%, 100% { transform: translateY(0) scale(1); }
+  25% { transform: translateY(-10px) scale(1.05); }
+  50% { transform: translateY(-5px) scale(1.02); }
+  75% { transform: translateY(-12px) scale(1.05); }
+}
+@keyframes goku-encourage {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.animate-shimmer { animation: shimmer 2s infinite; }
+.animate-float-star { animation: float-star 2s ease-in-out infinite; }
+.animate-goku-celebrate { animation: goku-celebrate 1.5s ease-in-out infinite; }
+.animate-goku-encourage { animation: goku-encourage 2.5s ease-in-out infinite; }
