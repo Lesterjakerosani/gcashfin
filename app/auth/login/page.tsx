@@ -35,9 +35,19 @@ export default function LoginPage() {
         </div>
 
         {/* Creator */}
-        <p className="text-center text-2xl font-bold text-gray-900 dark:text-[#E4E6EB] mb-6 tracking-tight">
-          This website was created by CHAO
-        </p>
+        <div className="flex flex-col items-center mb-6 gap-2">
+          <div className="flex items-center gap-3 w-full">
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-emerald-300 to-emerald-400 dark:via-emerald-700 dark:to-emerald-600" />
+            <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-emerald-500 dark:text-emerald-400">Creator</span>
+            <div className="flex-1 h-px bg-gradient-to-l from-transparent via-emerald-300 to-emerald-400 dark:via-emerald-700 dark:to-emerald-600" />
+          </div>
+          <div className="relative inline-flex flex-col items-center px-6 py-3 rounded-2xl border border-emerald-200/70 dark:border-emerald-800/50 bg-gradient-to-b from-emerald-50 to-white dark:from-emerald-900/20 dark:to-transparent shadow-sm">
+            <span className="text-[11px] tracking-widest text-gray-400 dark:text-[#B0B3B8] uppercase mb-0.5">This website was created by</span>
+            <span className="text-4xl font-black tracking-tight bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500 bg-clip-text text-transparent drop-shadow-sm">
+              CHAO
+            </span>
+          </div>
+        </div>
 
         {/* Card */}
         <div className="card p-8">
