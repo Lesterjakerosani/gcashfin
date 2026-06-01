@@ -14,108 +14,19 @@ interface GoalHistoryItem {
   achieved: boolean;
 }
 
-/* ── Goku SVG character ── */
-function GokuSVG({ mode }: { mode: "celebrate" | "encourage" }) {
+/* ── Real Goku GIF character ── */
+function GokuGif({ mode }: { mode: "celebrate" | "encourage" }) {
+  const gifId = mode === "celebrate" ? "B6SyssSlTgPXq" : "9G92we0pqre8M";
   return (
     <div className={`relative flex items-center justify-center ${mode === "celebrate" ? "animate-goku-celebrate" : "animate-goku-encourage"}`}>
-      {/* Aura glow */}
-      <div className={`absolute inset-0 rounded-full blur-2xl opacity-60 ${mode === "celebrate" ? "bg-yellow-400 animate-pulse" : "bg-blue-400 animate-pulse"}`} style={{ transform: "scale(1.6)" }} />
-      <svg width="120" height="160" viewBox="0 0 120 160" fill="none" xmlns="http://www.w3.org/2000/svg" className="relative z-10 drop-shadow-2xl">
-        {/* Energy aura */}
-        {mode === "celebrate" && (
-          <>
-            <ellipse cx="60" cy="140" rx="40" ry="12" fill="#FCD34D" opacity="0.3" />
-            <path d="M30 100 Q20 70 35 50" stroke="#FCD34D" strokeWidth="3" strokeLinecap="round" opacity="0.6" className="animate-pulse" />
-            <path d="M90 100 Q100 70 85 50" stroke="#FCD34D" strokeWidth="3" strokeLinecap="round" opacity="0.6" className="animate-pulse" />
-            <path d="M20 80 Q10 60 25 45" stroke="#FCD34D" strokeWidth="2" strokeLinecap="round" opacity="0.4" />
-            <path d="M100 80 Q110 60 95 45" stroke="#FCD34D" strokeWidth="2" strokeLinecap="round" opacity="0.4" />
-          </>
-        )}
-        {/* Body */}
-        <rect x="38" y="90" width="44" height="50" rx="8" fill={mode === "celebrate" ? "#F97316" : "#3B82F6"} />
-        {/* Belt */}
-        <rect x="38" y="112" width="44" height="8" rx="2" fill={mode === "celebrate" ? "#7C2D12" : "#1E3A5F"} />
-        {/* Chest symbol */}
-        <circle cx="60" cy="103" r="7" fill={mode === "celebrate" ? "#FCD34D" : "#93C5FD"} opacity="0.9" />
-        {/* Legs */}
-        <rect x="38" y="132" width="19" height="24" rx="5" fill={mode === "celebrate" ? "#EA580C" : "#2563EB"} />
-        <rect x="63" y="132" width="19" height="24" rx="5" fill={mode === "celebrate" ? "#EA580C" : "#2563EB"} />
-        {/* Boots */}
-        <rect x="35" y="148" width="25" height="12" rx="4" fill="#1C1917" />
-        <rect x="60" y="148" width="25" height="12" rx="4" fill="#1C1917" />
-        {/* Arms */}
-        {mode === "celebrate" ? (
-          <>
-            <rect x="16" y="90" width="22" height="12" rx="6" fill="#F97316" transform="rotate(-40 16 90)" />
-            <rect x="82" y="90" width="22" height="12" rx="6" fill="#F97316" transform="rotate(40 82 90)" />
-            {/* Fists up */}
-            <circle cx="10" cy="72" r="9" fill="#FBBF24" />
-            <circle cx="110" cy="72" r="9" fill="#FBBF24" />
-          </>
-        ) : (
-          <>
-            <rect x="20" y="92" width="20" height="12" rx="6" fill="#3B82F6" />
-            <rect x="80" y="92" width="20" height="12" rx="6" fill="#3B82F6" />
-            {/* Hands down */}
-            <circle cx="20" cy="108" r="8" fill="#FBBF24" />
-            <circle cx="100" cy="108" r="8" fill="#FBBF24" />
-          </>
-        )}
-        {/* Neck */}
-        <rect x="52" y="72" width="16" height="20" rx="4" fill="#FBBF24" />
-        {/* Head */}
-        <ellipse cx="60" cy="60" rx="26" ry="28" fill="#FBBF24" />
-        {/* Eyes */}
-        {mode === "celebrate" ? (
-          <>
-            <ellipse cx="50" cy="56" rx="5" ry="6" fill="white" />
-            <ellipse cx="70" cy="56" rx="5" ry="6" fill="white" />
-            <circle cx="52" cy="57" r="3" fill="#1C1917" />
-            <circle cx="72" cy="57" r="3" fill="#1C1917" />
-            <circle cx="53" cy="56" r="1" fill="white" />
-            <circle cx="73" cy="56" r="1" fill="white" />
-          </>
-        ) : (
-          <>
-            <ellipse cx="50" cy="58" rx="5" ry="5" fill="white" />
-            <ellipse cx="70" cy="58" rx="5" ry="5" fill="white" />
-            <circle cx="51" cy="59" r="3" fill="#1C1917" />
-            <circle cx="71" cy="59" r="3" fill="#1C1917" />
-          </>
-        )}
-        {/* Eyebrows */}
-        <path d={mode === "celebrate" ? "M44 48 Q50 44 56 47" : "M44 52 Q50 50 56 52"} stroke="#1C1917" strokeWidth="2.5" strokeLinecap="round" />
-        <path d={mode === "celebrate" ? "M64 47 Q70 44 76 48" : "M64 52 Q70 50 76 52"} stroke="#1C1917" strokeWidth="2.5" strokeLinecap="round" />
-        {/* Mouth */}
-        {mode === "celebrate" ? (
-          <path d="M50 70 Q60 78 70 70" stroke="#1C1917" strokeWidth="2" strokeLinecap="round" fill="none" />
-        ) : (
-          <path d="M52 72 Q60 68 68 72" stroke="#1C1917" strokeWidth="2" strokeLinecap="round" fill="none" />
-        )}
-        {/* Ear */}
-        <ellipse cx="34" cy="62" rx="5" ry="7" fill="#FBBF24" />
-        <ellipse cx="86" cy="62" rx="5" ry="7" fill="#FBBF24" />
-        {/* Spiky hair — Super Saiyan gold or black */}
-        {mode === "celebrate" ? (
-          <>
-            <path d="M34 45 Q28 20 40 15 Q42 35 48 38" fill="#FCD34D" />
-            <path d="M42 38 Q38 10 52 5 Q52 30 58 35" fill="#FDE68A" />
-            <path d="M55 35 Q55 5 68 8 Q62 28 65 35" fill="#FCD34D" />
-            <path d="M63 36 Q72 12 80 18 Q70 32 72 38" fill="#F59E0B" />
-            <path d="M70 40 Q82 22 86 30 Q76 38 76 44" fill="#FCD34D" />
-          </>
-        ) : (
-          <>
-            <path d="M34 45 Q28 20 40 15 Q42 35 48 38" fill="#1C1917" />
-            <path d="M42 38 Q38 10 52 5 Q52 30 58 35" fill="#292524" />
-            <path d="M55 35 Q55 5 68 8 Q62 28 65 35" fill="#1C1917" />
-            <path d="M63 36 Q72 12 80 18 Q70 32 72 38" fill="#292524" />
-            <path d="M70 40 Q82 22 86 30 Q76 38 76 44" fill="#1C1917" />
-          </>
-        )}
-        {/* Tail */}
-        <path d="M78 130 Q95 120 98 108 Q100 95 90 92" stroke={mode === "celebrate" ? "#92400E" : "#1E3A5F"} strokeWidth="6" strokeLinecap="round" fill="none" />
-      </svg>
+      {/* Aura glow behind gif */}
+      <div className={`absolute inset-0 rounded-full blur-2xl opacity-50 ${mode === "celebrate" ? "bg-yellow-400 animate-pulse" : "bg-blue-400 animate-pulse"}`} style={{ transform: "scale(1.4)" }} />
+      <img
+        src={`https://media.giphy.com/media/${gifId}/giphy.gif`}
+        alt={mode === "celebrate" ? "Goku Super Saiyan celebrating" : "Goku thumbs up encouraging"}
+        className="relative z-10 w-28 h-28 object-contain drop-shadow-2xl"
+        unoptimized="true"
+      />
     </div>
   );
 }
@@ -316,7 +227,7 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
               {achieved ? (
                 <div className="flex items-center gap-4 bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 rounded-2xl p-4 border border-yellow-300 dark:border-yellow-700">
                   <div className="flex-shrink-0">
-                    <GokuSVG mode="celebrate" />
+                    <GokuGif mode="celebrate" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
@@ -337,7 +248,7 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
               ) : (
                 <div className="flex items-center gap-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-4 border border-blue-200 dark:border-blue-800">
                   <div className="flex-shrink-0">
-                    <GokuSVG mode="encourage" />
+                    <GokuGif mode="encourage" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
