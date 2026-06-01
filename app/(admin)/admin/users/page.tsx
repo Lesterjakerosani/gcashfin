@@ -69,9 +69,6 @@ export default function AdminUsersPage() {
           <h1 className="page-title">User Management</h1>
           <p className="page-subtitle">{users.filter(u => u.role === "user").length} registered users</p>
         </div>
-        <button onClick={() => setShowAdd(true)} className="btn-primary gap-1.5">
-          <Plus size={14} /> Add User
-        </button>
       </div>
 
       {/* Filters */}
