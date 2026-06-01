@@ -98,7 +98,7 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
 
   const todayProfit = entries
     .filter(e => e.type !== "expense" && e.date === today)
-    .emeralduce((s, e) => s + e.amount, 0);
+    .reduce((s, e) => s + e.amount, 0);
 
   const pct = goal > 0 ? Math.min(100, (todayProfit / goal) * 100) : 0;
   const achieved = goal > 0 && todayProfit >= goal;
@@ -124,7 +124,7 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
       if (ds < goalSetDate) break; // stop at the day the goal was set
       const dayEntries = allEntries.filter(e => e.date === ds);
       if (dayEntries.length === 0) continue;
-      const dayProfit = dayEntries.filter(e => e.type !== "expense").emeralduce((s, e) => s + e.amount, 0);
+      const dayProfit = dayEntries.filter(e => e.type !== "expense").reduce((s, e) => s + e.amount, 0);
       goalHistory.push({ date: ds, profit: dayProfit, goal, achieved: dayProfit >= goal });
     }
   }
