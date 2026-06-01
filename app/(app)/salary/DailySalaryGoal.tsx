@@ -15,7 +15,7 @@ interface GoalHistoryItem {
 }
 
 /* ── Famous anime male characters (Giphy stickers — transparent background) ── */
-function CharacterGif({ mode }: { mode: "celebrate" | "encourage" | "sad" }) {
+function CharacterGif({ mode, size = "w-52 h-52" }: { mode: "celebrate" | "encourage" | "sad"; size?: string }) {
   const stickerId = mode === "celebrate"
     ? "d5WPPDrT5eDs0CaGPA"   // Luffy big happy smile (Netflix official)
     : mode === "sad"
@@ -27,8 +27,81 @@ function CharacterGif({ mode }: { mode: "celebrate" | "encourage" | "sad" }) {
       <img
         src={`https://media.giphy.com/media/${stickerId}/giphy.webp`}
         alt={label}
-        className="w-52 h-52 object-contain"
+        className={`${size} object-contain`}
       />
+    </div>
+  );
+}
+
+/* ── Midnight result popup ── */
+function MidnightPopup({ result, onClose }: { result: "achieved" | "missed"; onClose: () => void }) {
+  useEffect(() => {
+    if (result === "achieved") {
+      setTimeout(fireConfetti, 300);
+      setTimeout(fireConfetti, 1100);
+    }
+  }, [result]);
+
+  const achieved = result === "achieved";
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+      <div className={`relative rounded-3xl border-2 shadow-2xl w-full max-w-sm overflow-hidden ${
+        achieved
+          ? "bg-gradient-to-b from-yellow-50 to-orange-50 dark:from-yellow-900/40 dark:to-orange-900/40 border-yellow-400"
+          : "bg-gradient-to-b from-slate-800 to-slate-900 dark:from-slate-900 dark:to-black border-slate-600"
+      }`}>
+        {/* Close button */}
+        <button onClick={onClose} className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-black/20 hover:bg-black/40 flex items-center justify-center transition-colors">
+          <X size={14} className="text-white" />
+        </button>
+
+        <div className="flex flex-col items-center px-6 pt-8 pb-6">
+          {/* Speech bubble cloud above character */}
+          <div className="relative mb-2 w-full">
+            <div className={`rounded-2xl px-5 py-4 text-center border-2 shadow-lg ${
+              achieved
+                ? "bg-yellow-400 border-yellow-500 text-yellow-900"
+                : "bg-white border-gray-200 text-gray-800"
+            }`}>
+              <p className="text-base font-bold leading-snug">
+                {achieved
+                  ? "🏆 Congratulations! You crushed your daily goal! Amazing work — keep it up!"
+                  : "It's okay, better luck next time! Never give up, every day is a new chance! 💪"}
+              </p>
+              {/* Bubble tail pointing down */}
+              <div className={`absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[14px] ${
+                achieved ? "border-t-yellow-400" : "border-t-white"
+              }`} />
+            </div>
+          </div>
+
+          {/* Sasuke character — both states use Sasuke */}
+          <div className={`flex items-center justify-center ${achieved ? "animate-goku-celebrate" : "animate-goku-encourage"}`}>
+            <img
+              src={`https://media.giphy.com/media/Pbk40kdlhTy7o2Flz7/giphy.webp`}
+              alt="Sasuke"
+              className="w-64 h-64 object-contain"
+            />
+          </div>
+
+          {achieved && (
+            <div className="flex gap-2 flex-wrap justify-center mt-2">
+              {["🌟 Goal Crusher", "⚡ Legendary", "💪 Max Power"].map(b => (
+                <span key={b} className="text-xs bg-yellow-200 dark:bg-yellow-700/50 text-yellow-800 dark:text-yellow-200 px-3 py-1 rounded-full font-semibold">{b}</span>
+              ))}
+            </div>
+          )}
+
+          <button onClick={onClose} className={`mt-5 w-full py-3 rounded-2xl font-bold text-sm transition-all ${
+            achieved
+              ? "bg-yellow-400 hover:bg-yellow-500 text-yellow-900"
+              : "bg-slate-600 hover:bg-slate-500 text-white"
+          }`}>
+            {achieved ? "Awesome! Let's keep going! 🚀" : "Got it! I'll do better tomorrow!"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -75,6 +148,7 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
   const [editingGoal, setEditingGoal] = useState(false);
   const [goalInput, setGoalInput] = useState("");
   const confettiFiemerald = useRef(false);
+  const [midnightResult, setMidnightResult] = useState<"achieved" | "missed" | null>(null);
 
   const { data: settings = {} } = useQuery<Record<string, string>>({
     queryKey: ["settings"],
@@ -103,6 +177,20 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
   const pct = goal > 0 ? Math.min(100, (todayProfit / goal) * 100) : 0;
   const achieved = goal > 0 && todayProfit >= goal;
   const hasGoal = goal > 0;
+
+  // Midnight check — show popup when a new day starts if goal was set
+  useEffect(() => {
+    if (!goal || allEntries.length === 0) return;
+    const lastChecked = localStorage.getItem("goalLastCheckedDate");
+    if (lastChecked === today) return; // already checked today
+    // yesterday's date string
+    const d = new Date(); d.setDate(d.getDate() - 1);
+    const yesterday = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    if (yesterday < goalSetDate) { localStorage.setItem("goalLastCheckedDate", today); return; } // goal wasn't set yet yesterday
+    const yesterdayProfit = allEntries.filter(e => e.type !== "expense" && e.date === yesterday).reduce((s, e) => s + e.amount, 0);
+    setMidnightResult(yesterdayProfit >= goal ? "achieved" : "missed");
+    localStorage.setItem("goalLastCheckedDate", today);
+  }, [today, goal, goalSetDate, allEntries]);
 
   // Fire confetti once when achieved
   useEffect(() => {
@@ -141,6 +229,7 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
   }
 
   return (
+    <>
     <div className="space-y-4">
       {/* Goal Card */}
       <div className={`relative overflow-hidden rounded-2xl border-2 transition-all duration-500 ${
@@ -282,5 +371,11 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
       </div>
 
     </div>
+
+    {/* Midnight result popup */}
+    {midnightResult && (
+      <MidnightPopup result={midnightResult} onClose={() => setMidnightResult(null)} />
+    )}
+    </>
   );
 }
