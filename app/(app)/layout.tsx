@@ -8,6 +8,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const session = await getServerSession(authOptions);
   if (!session) redirect("/auth/login");
 
+  // Admins go to the admin panel
+  if ((session.user as any).role === "admin") redirect("/admin/dashboard");
+
   const user = await prisma.user.findUnique({
     where: { id: (session.user as any).id },
     select: { securityQuestion: true },

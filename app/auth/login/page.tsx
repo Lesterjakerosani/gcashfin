@@ -18,8 +18,15 @@ export default function LoginPage() {
     setLoading(true); setError("");
     const res = await signIn("credentials", { email, password, redirect: false });
     setLoading(false);
-    if (res?.error) { setError("Invalid email or password."); }
-    else { toast.success("Welcome back!"); router.push("/dashboard"); router.refresh(); }
+    if (res?.error) { setError("Invalid email or password."); return; }
+    // Fetch session to determine role-based redirect
+    const sessionRes = await fetch("/api/auth/session");
+    const session = await sessionRes.json();
+    const role = session?.user?.role;
+    toast.success("Welcome back!");
+    if (role === "admin") { router.push("/admin/dashboard"); }
+    else { router.push("/dashboard"); }
+    router.refresh();
   }
 
   return (
