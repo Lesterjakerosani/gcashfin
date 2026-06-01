@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import confetti from "canvas-confetti";
-import { Target, Edit2, Check, X, Trophy, Star, Flame, Calendar } from "lucide-react";
+import { Target, Edit2, Check, X, Trophy, Star, Flame } from "lucide-react";
 import { fmt, todayStr } from "@/lib/utils";
 
 type Entry = { id: string; date: string; type: string; amount: number; category: string; notes?: string; createdAt: string; };
@@ -115,14 +115,16 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
     if (!achieved) confettiFired.current = false;
   }, [achieved]);
 
-  // Build goal history from allEntries (last 14 days, skip today)
+  // Build goal history — only days that have actual salary entries, skip today
   const goalHistory: GoalHistoryItem[] = [];
   if (goal > 0) {
     for (let i = 1; i <= 14; i++) {
       const d = new Date();
       d.setDate(d.getDate() - i);
       const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-      const dayProfit = allEntries.filter(e => e.type !== "expense" && e.date === ds).reduce((s, e) => s + e.amount, 0);
+      const dayEntries = allEntries.filter(e => e.date === ds);
+      if (dayEntries.length === 0) continue;
+      const dayProfit = dayEntries.filter(e => e.type !== "expense").reduce((s, e) => s + e.amount, 0);
       goalHistory.push({ date: ds, profit: dayProfit, goal, achieved: dayProfit >= goal });
     }
   }
@@ -281,56 +283,6 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
         </div>
       </div>
 
-      {/* Goal History */}
-      {hasGoal && goalHistory.length > 0 && (
-        <div className="card overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 dark:border-[#3E4042] flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Calendar size={15} className="text-gray-400 dark:text-[#B0B3B8]" />
-              <h3 className="section-title">Goal History</h3>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-full font-medium">
-                {historyAchieved}/{goalHistory.length} achieved
-              </span>
-            </div>
-          </div>
-          <div className="divide-y divide-gray-100 dark:divide-[#3E4042]/50 max-h-64 overflow-y-auto">
-            {goalHistory.map(item => {
-              const itemPct = Math.min(100, (item.profit / item.goal) * 100);
-              const d = new Date(item.date + "T00:00:00");
-              const label = d.toLocaleDateString("en-PH", { weekday: "short", month: "short", day: "numeric" });
-              return (
-                <div key={item.date} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 dark:hover:bg-[#3A3B3C]/20 transition-colors">
-                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden ${item.achieved ? "bg-yellow-100 dark:bg-yellow-900/30" : "bg-gray-100 dark:bg-[#3A3B3C]"}`}>
-                    {item.achieved
-                      ? <Trophy size={14} className="text-yellow-500" />
-                      : <img src="https://media.giphy.com/media/OHlZNhjkvEXLnBjezC/giphy.gif" alt="sad" className="w-full h-full object-cover" />
-                    }
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-medium text-gray-700 dark:text-[#E4E6EB]">{label}</span>
-                      <span className={`text-xs font-mono ${item.achieved ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"}`}>
-                        ₱{fmt(item.profit)} / ₱{fmt(item.goal)}
-                      </span>
-                    </div>
-                    <div className="h-1.5 bg-gray-100 dark:bg-[#3A3B3C] rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${item.achieved ? "bg-gradient-to-r from-yellow-400 to-orange-400" : "bg-gradient-to-r from-blue-400 to-indigo-400"}`}
-                        style={{ width: `${itemPct}%` }}
-                      />
-                    </div>
-                  </div>
-                  <span className={`text-[10px] font-bold flex-shrink-0 ${item.achieved ? "text-yellow-500" : "text-gray-400"}`}>
-                    {itemPct.toFixed(0)}%
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
