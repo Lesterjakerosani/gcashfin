@@ -34,6 +34,11 @@ export default function LoginPage() {
           <p className="text-sm text-gray-500 dark:text-[#B0B3B8] mt-1">Financial Management System</p>
         </div>
 
+        {/* Creator */}
+        <p className="text-center text-2xl font-bold text-gray-900 dark:text-[#E4E6EB] mb-6 tracking-tight">
+          This website created by CHAO
+        </p>
+
         {/* Card */}
         <div className="card p-8">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-[#E4E6EB] mb-1">Sign in</h2>
