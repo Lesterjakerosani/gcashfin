@@ -29,7 +29,6 @@ function GokuGif({ mode }: { mode: "celebrate" | "encourage" | "sad" }) {
         src={`https://media.giphy.com/media/${gifId}/giphy.gif`}
         alt={mode === "celebrate" ? "Goku Super Saiyan celebrating" : mode === "sad" ? "Goku sad" : "Goku thumbs up"}
         className="relative z-10 w-28 h-28 object-contain drop-shadow-2xl"
-        unoptimized="true"
       />
     </div>
   );
