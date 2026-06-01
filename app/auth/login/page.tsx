@@ -4,7 +4,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, KeyRound } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -96,12 +96,18 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="text-center text-gray-400 dark:text-[#B0B3B8] text-sm mt-6">
-            No account?{" "}
-            <Link href="/auth/register" className="text-gray-900 dark:text-[#E4E6EB] font-medium hover:underline transition-colors">
-              Create one
+          <div className="flex items-center justify-between mt-5">
+            <p className="text-gray-400 dark:text-[#B0B3B8] text-sm">
+              No account?{" "}
+              <Link href="/auth/register" className="text-gray-900 dark:text-[#E4E6EB] font-medium hover:underline transition-colors">
+                Create one
+              </Link>
+            </p>
+            <Link href="/auth/forgot-password" className="flex items-center gap-1 text-xs text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+              <KeyRound size={12} />
+              Forgot password?
             </Link>
-          </p>
+          </div>
         </div>
       </div>
     </div>

@@ -8,13 +8,17 @@ datasource db {
 }
 
 model User {
-  id            String        @id @default(cuid())
-  name          String
-  email         String        @unique
-  password      String
-  role          String        @default("user")
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id                        String    @id @default(cuid())
+  name                      String
+  email                     String    @unique
+  password                  String
+  role                      String    @default("user")
+  securityQuestion          String?
+  securityAnswer            String?
+  forgotPasswordToken       String?
+  forgotPasswordTokenExpiry DateTime?
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
   accounts      Account[]
   transactions  Transaction[]
   salaryEntries SalaryEntry[]
