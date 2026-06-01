@@ -6,7 +6,7 @@ import { signOut } from "next-auth/react";
 import {
   LayoutDashboard, DollarSign, BarChart3, PieChart, Shield,
   FileText, LogOut, ChevronLeft, ChevronRight, Moon, Sun,
-  TrendingUp, Menu, X,
+  Menu, X,
 } from "lucide-react";
 
 const links = [
@@ -56,16 +56,12 @@ export function Sidebar({ user }: { user: User }) {
       <div className="flex items-center justify-between px-4 py-4 border-b border-gray-100 dark:border-[#3E4042]">
         {(!collapsed || isMobile) && (
           <Link href="/dashboard" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
-              <TrendingUp size={16} className="text-white" />
-            </div>
+            <img src="/favicon.ico" alt="GCashFin" className="w-8 h-8 rounded-xl object-contain flex-shrink-0" />
             <span className="font-bold text-gray-900 dark:text-[#E4E6EB] text-[15px] tracking-tight">GCashFin</span>
           </Link>
         )}
         {collapsed && !isMobile && (
-          <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center shadow-sm mx-auto">
-            <TrendingUp size={16} className="text-white" />
-          </div>
+          <img src="/favicon.ico" alt="GCashFin" className="w-8 h-8 rounded-xl object-contain mx-auto" />
         )}
         {isMobile ? (
           <button onClick={() => setMobileOpen(false)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#3A3B3C] text-gray-400 transition-colors">
@@ -140,9 +136,7 @@ export function Sidebar({ user }: { user: User }) {
       {/* Mobile top bar */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white dark:bg-[#242526] border-b border-gray-200 dark:border-[#3E4042] px-4 py-3 flex items-center justify-between">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-lg flex items-center justify-center">
-            <TrendingUp size={14} className="text-white" />
-          </div>
+          <img src="/favicon.ico" alt="GCashFin" className="w-7 h-7 rounded-lg object-contain" />
           <span className="font-bold text-gray-900 dark:text-[#E4E6EB] text-sm">GCashFin</span>
         </Link>
         <button onClick={() => setMobileOpen(true)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#3A3B3C] text-gray-600 dark:text-[#E4E6EB] transition-colors">

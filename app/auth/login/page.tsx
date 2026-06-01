@@ -4,7 +4,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import { TrendingUp, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -27,9 +27,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl shadow-lg mb-4">
-            <TrendingUp size={26} className="text-white" />
-          </div>
+          <img src="/favicon.ico" alt="GCashFin" className="w-14 h-14 rounded-2xl shadow-lg mb-4 object-contain mx-auto" />
           <h1 className="text-2xl font-bold text-gray-900 dark:text-[#E4E6EB] tracking-tight">GCashFin</h1>
           <p className="text-sm text-gray-500 dark:text-[#B0B3B8] mt-1">Financial Management System</p>
         </div>
