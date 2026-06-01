@@ -95,6 +95,7 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
   });
 
   const goal = parseFloat(settings["dailySalaryGoal"] || "0");
+  const goalSetDate = settings["dailySalaryGoalSetDate"] || todayStr();
   const today = todayStr();
 
   const todayProfit = entries
@@ -115,13 +116,14 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
     if (!achieved) confettiFired.current = false;
   }, [achieved]);
 
-  // Build goal history — only days that have actual salary entries, skip today
+  // Build goal history — only days AFTER the goal was first set, with actual entries
   const goalHistory: GoalHistoryItem[] = [];
   if (goal > 0) {
-    for (let i = 1; i <= 14; i++) {
+    for (let i = 1; i <= 60; i++) {
       const d = new Date();
       d.setDate(d.getDate() - i);
       const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+      if (ds < goalSetDate) break; // stop at the day the goal was set
       const dayEntries = allEntries.filter(e => e.date === ds);
       if (dayEntries.length === 0) continue;
       const dayProfit = dayEntries.filter(e => e.type !== "expense").reduce((s, e) => s + e.amount, 0);
@@ -134,6 +136,10 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
     const v = parseFloat(goalInput);
     if (!v || v <= 0) return;
     saveSetting.mutate({ key: "dailySalaryGoal", value: String(v) });
+    // Record the date the goal was first set — never overwrite once set
+    if (!settings["dailySalaryGoalSetDate"]) {
+      saveSetting.mutate({ key: "dailySalaryGoalSetDate", value: todayStr() });
+    }
   }
 
   return (
