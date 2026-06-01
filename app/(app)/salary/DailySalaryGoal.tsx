@@ -14,18 +14,19 @@ interface GoalHistoryItem {
   achieved: boolean;
 }
 
-/* ── Cute chibi character (Giphy stickers — transparent background) ── */
+/* ── Famous anime male characters (Giphy stickers — transparent background) ── */
 function CharacterGif({ mode }: { mode: "celebrate" | "encourage" | "sad" }) {
   const stickerId = mode === "celebrate"
-    ? "W4NYXiECgedGtlACnj"   // Happy kawaii chibi
+    ? "d5WPPDrT5eDs0CaGPA"   // Luffy big happy smile (Netflix official)
     : mode === "sad"
-    ? "wMlcT3exSxYAcbkby6"   // Tonton Friends cute bunny crying
-    : "5tzPCD6RDOT2CX7wib";  // Excited kawaii chibi
+    ? "Pbk40kdlhTy7o2Flz7"   // Sasuke sad
+    : "J6VWOd9svfh5KESnP9";  // Naruto energetic
+  const label = mode === "celebrate" ? "Luffy celebrating" : mode === "sad" ? "Sasuke sad" : "Naruto encouraging";
   return (
     <div className={`flex items-center justify-center ${mode === "celebrate" ? "animate-goku-celebrate" : "animate-goku-encourage"}`}>
       <img
         src={`https://media.giphy.com/media/${stickerId}/giphy.webp`}
-        alt={mode === "celebrate" ? "Cute chibi celebrating" : mode === "sad" ? "Cute character sad" : "Cute chibi excited"}
+        alt={label}
         className="w-52 h-52 object-contain"
       />
     </div>
