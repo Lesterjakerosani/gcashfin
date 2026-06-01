@@ -266,17 +266,17 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
                     <div className="flex items-center gap-2 mb-1">
                       <Flame size={16} className="text-blue-500" />
                       <span className="text-sm font-bold text-blue-700 dark:text-blue-400">
-                        {pct >= 75 ? "Almost There!" : pct >= 50 ? "Keep Going!" : pct > 0 ? "You Can Do It!" : "Start Your Journey!"}
+                        {pct >= 75 ? "Almost There!" : pct >= 50 ? "Keep Going!" : pct > 0 ? "Still Going Strong!" : "Start Your Journey!"}
                       </span>
                     </div>
                     <p className="text-xs font-medium text-blue-800 dark:text-blue-300 leading-relaxed">
                       {pct >= 75
-                        ? "Almost there! You're so close — give it everything you've got!"
+                        ? "Almost there! Give it everything — you are so close to the goal!"
                         : pct >= 50
                         ? "More than halfway! Your power is growing — don't stop now!"
                         : pct > 0
-                        ? "Keep pushing! Every peso counts — the day is not over yet!"
-                        : "Your journey begins now! Set your power level and surpass your limits!"}
+                        ? "The day is not over yet! Keep earning — every peso brings you closer!"
+                        : "Set your power level and start your journey — you can do it!"}
                     </p>
                     <div className="mt-2">
                       <span className="text-[10px] text-blue-500 dark:text-blue-400 font-mono">₱{fmt(Math.max(0, goal - todayProfit))} remaining today</span>
