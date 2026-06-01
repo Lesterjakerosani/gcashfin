@@ -14,20 +14,19 @@ interface GoalHistoryItem {
   achieved: boolean;
 }
 
-/* ── Real Goku GIF character ── */
-function GokuGif({ mode }: { mode: "celebrate" | "encourage" | "sad" }) {
-  const gifId = mode === "celebrate"
-    ? "B6SyssSlTgPXq"      // Super Saiyan transformation
+/* ── Cute chibi character (Giphy stickers — transparent background) ── */
+function CharacterGif({ mode }: { mode: "celebrate" | "encourage" | "sad" }) {
+  const stickerId = mode === "celebrate"
+    ? "W4NYXiECgedGtlACnj"   // Happy kawaii chibi
     : mode === "sad"
-    ? "OHlZNhjkvEXLnBjezC" // Sad Goku
-    : "9G92we0pqre8M";     // Thumbs up / encouraging
+    ? "wMlcT3exSxYAcbkby6"   // Tonton Friends cute bunny crying
+    : "5tzPCD6RDOT2CX7wib";  // Excited kawaii chibi
   return (
     <div className={`flex items-center justify-center ${mode === "celebrate" ? "animate-goku-celebrate" : "animate-goku-encourage"}`}>
       <img
-        src={`https://media.giphy.com/media/${gifId}/giphy.gif`}
-        alt={mode === "celebrate" ? "Goku Super Saiyan celebrating" : mode === "sad" ? "Goku sad" : "Goku thumbs up"}
+        src={`https://media.giphy.com/media/${stickerId}/giphy.webp`}
+        alt={mode === "celebrate" ? "Cute chibi celebrating" : mode === "sad" ? "Cute character sad" : "Cute chibi excited"}
         className="w-52 h-52 object-contain"
-        style={{ mixBlendMode: "screen" }}
       />
     </div>
   );
@@ -274,7 +273,7 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
                   </div>
                 </div>
                 {/* Goku GIF — no background, just the character */}
-                <GokuGif mode={achieved ? "celebrate" : "encourage"} />
+                <CharacterGif mode={achieved ? "celebrate" : "encourage"} />
               </div>
             </>
           )}
