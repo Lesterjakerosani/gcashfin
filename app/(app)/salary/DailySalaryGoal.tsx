@@ -26,7 +26,8 @@ function GokuGif({ mode }: { mode: "celebrate" | "encourage" | "sad" }) {
       <img
         src={`https://media.giphy.com/media/${gifId}/giphy.gif`}
         alt={mode === "celebrate" ? "Goku Super Saiyan celebrating" : mode === "sad" ? "Goku sad" : "Goku thumbs up"}
-        className="w-44 h-44 object-contain drop-shadow-2xl"
+        className="w-52 h-52 object-contain"
+        style={{ mixBlendMode: "screen" }}
       />
     </div>
   );
@@ -232,42 +233,25 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
                 </div>
               </div>
 
-              {/* Goku + Message */}
-              {achieved ? (
-                <div className="flex items-center gap-4 bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 rounded-2xl p-4 border border-yellow-300 dark:border-yellow-700">
-                  <div className="flex-shrink-0">
-                    <GokuGif mode="celebrate" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Trophy size={16} className="text-yellow-500" />
-                      <span className="text-sm font-bold text-yellow-700 dark:text-yellow-400">Goal Achieved!</span>
-                      <span className="text-lg">🏆</span>
-                    </div>
-                    <p className="text-xs font-medium text-orange-800 dark:text-orange-300 leading-relaxed">
-                      Congratulations! You achieved your daily salary goal! Keep pushing beyond your limits!
-                    </p>
-                    <div className="flex gap-1.5 mt-2 flex-wrap">
-                      {["💪 Power Level: MAX", "⚡ Super Saiyan Mode", "🌟 Goal Crusher"].map(badge => (
-                        <span key={badge} className="text-[10px] bg-yellow-200 dark:bg-yellow-800/50 text-yellow-800 dark:text-yellow-300 px-2 py-0.5 rounded-full font-medium">{badge}</span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center gap-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-4 border border-blue-200 dark:border-blue-800">
-                  <div className="flex-shrink-0">
-                    <GokuGif mode="encourage" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Flame size={16} className="text-blue-500" />
-                      <span className="text-sm font-bold text-blue-700 dark:text-blue-400">
-                        {pct >= 75 ? "Almost There!" : pct >= 50 ? "Keep Going!" : pct > 0 ? "Still Going Strong!" : "Start Your Journey!"}
+              {/* Goku + Speech Bubble */}
+              <div className="flex flex-col items-center pt-2">
+                {/* Speech bubble cloud above head */}
+                <div className="relative mb-1 max-w-xs w-full">
+                  <div className={`rounded-2xl px-4 py-3 text-center shadow-lg border-2 ${
+                    achieved
+                      ? "bg-yellow-400 border-yellow-500 text-yellow-900"
+                      : "bg-white dark:bg-gray-100 border-gray-200 text-gray-900"
+                  }`}>
+                    <div className="flex items-center justify-center gap-1.5 mb-1">
+                      {achieved ? <Trophy size={14} className="text-yellow-800" /> : <Flame size={14} className="text-blue-500" />}
+                      <span className="text-xs font-bold">
+                        {achieved ? "Goal Achieved! 🏆" : pct >= 75 ? "Almost There!" : pct >= 50 ? "Keep Going!" : pct > 0 ? "Still Going Strong!" : "Start Your Journey!"}
                       </span>
                     </div>
-                    <p className="text-xs font-medium text-blue-800 dark:text-blue-300 leading-relaxed">
-                      {pct >= 75
+                    <p className="text-[11px] font-medium leading-relaxed">
+                      {achieved
+                        ? "Congratulations! You achieved your daily salary goal! Keep pushing beyond your limits!"
+                        : pct >= 75
                         ? "Almost there! Give it everything — you are so close to the goal!"
                         : pct >= 50
                         ? "More than halfway! Your power is growing — don't stop now!"
@@ -275,12 +259,23 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
                         ? "The day is not over yet! Keep earning — every peso brings you closer!"
                         : "Set your power level and start your journey — you can do it!"}
                     </p>
-                    <div className="mt-2">
-                      <span className="text-[10px] text-blue-500 dark:text-blue-400 font-mono">₱{fmt(Math.max(0, goal - todayProfit))} remaining today</span>
-                    </div>
+                    {!achieved && (
+                      <p className="text-[10px] font-mono mt-1 text-blue-600">₱{fmt(Math.max(0, goal - todayProfit))} remaining today</p>
+                    )}
+                    {achieved && (
+                      <div className="flex gap-1 mt-2 justify-center flex-wrap">
+                        {["💪 MAX", "⚡ Super Saiyan", "🌟 Crusher"].map(b => (
+                          <span key={b} className="text-[10px] bg-yellow-600/30 px-2 py-0.5 rounded-full font-medium">{b}</span>
+                        ))}
+                      </div>
+                    )}
+                    {/* Bubble tail pointing down */}
+                    <div className={`absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[12px] ${achieved ? "border-t-yellow-400" : "border-t-white dark:border-t-gray-100"}`} />
                   </div>
                 </div>
-              )}
+                {/* Goku GIF — no background, just the character */}
+                <GokuGif mode={achieved ? "celebrate" : "encourage"} />
+              </div>
             </>
           )}
         </div>
