@@ -94,3 +94,19 @@ model Setting {
 
   @@unique([userId, key])
 }
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  userName  String
+  userEmail String
+  action    String
+  details   String?
+  createdAt DateTime @default(now())
+}
+
+model SystemSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}

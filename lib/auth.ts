@@ -2,6 +2,7 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "./prisma";
 import bcrypt from "bcryptjs";
+import { logActivity } from "./log-activity";
 
 // Get or generate secret - required for NextAuth
 const getSecret = () => {
@@ -48,6 +49,7 @@ export const authOptions: NextAuthOptions = {
         if (!user) return null;
         const valid = await bcrypt.compare(credentials.password, user.password);
         if (!valid) return null;
+        await logActivity({ userId: user.id, userName: user.name, userEmail: user.email, action: "Logged in", details: `Role: ${user.role}` });
         return { id: user.id, name: user.name, email: user.email, role: user.role };
       },
     }),

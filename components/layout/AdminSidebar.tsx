@@ -4,13 +4,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
-  LayoutDashboard, Users, LogOut, ChevronLeft, ChevronRight,
-  Moon, Sun, Menu, X, ShieldCheck,
+  LayoutDashboard, Users, FileText, BarChart3, Settings,
+  Activity, LogOut, ChevronLeft, ChevronRight, Moon, Sun, Menu, X, ShieldCheck,
 } from "lucide-react";
 
 const links = [
-  { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/users",     label: "Users",     icon: Users },
+  { href: "/admin/dashboard", label: "Dashboard",  icon: LayoutDashboard },
+  { href: "/admin/users",     label: "Users",      icon: Users },
+  { href: "/admin/records",   label: "Records",    icon: FileText },
+  { href: "/admin/reports",   label: "Reports",    icon: BarChart3 },
+  { href: "/admin/settings",  label: "Settings",   icon: Settings },
+  { href: "/admin/activity",  label: "Activity",   icon: Activity },
 ];
 
 type User = { name?: string | null; email?: string | null; role?: string };
