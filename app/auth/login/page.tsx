@@ -36,7 +36,7 @@ export default function LoginPage() {
 
         {/* Creator */}
         <p className="text-center text-2xl font-bold text-gray-900 dark:text-[#E4E6EB] mb-6 tracking-tight">
-          This website created by CHAO
+          This website was created by CHAO
         </p>
 
         {/* Card */}
