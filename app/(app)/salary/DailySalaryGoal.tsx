@@ -171,8 +171,8 @@ export default function DailySalaryGoal({ entries }: { entries: Entry[] }) {
   const today = todayStr();
 
   const todayProfit = entries
-    .filter(e => e.type !== "expense" && e.date === today)
-    .reduce((s, e) => s + e.amount, 0);
+    .filter(e => e.date === today)
+    .reduce((s, e) => s + (e.type === "expense" ? -e.amount : e.amount), 0);
 
   const pct = goal > 0 ? Math.min(100, (todayProfit / goal) * 100) : 0;
   const achieved = goal > 0 && todayProfit >= goal;
