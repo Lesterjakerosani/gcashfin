@@ -65,8 +65,8 @@ export default function SalaryPage() {
   const totalProfit = entries.filter(e => e.type === "profit").reduce((s, e) => s + e.amount, 0);
   const totalExpense = entries.filter(e => e.type === "expense").reduce((s, e) => s + e.amount, 0);
   const netIncome = totalProfit - totalExpense;
-  const todayProfit = entries.filter(e => e.type === "profit" && e.date === todayStr()).reduce((s, e) => s + e.amount, 0);
   const todayExpense = entries.filter(e => e.type === "expense" && e.date === todayStr()).reduce((s, e) => s + e.amount, 0);
+  const todayProfit = entries.filter(e => e.date === todayStr()).reduce((s, e) => s + (e.type === "expense" ? -e.amount : e.amount), 0);
 
   const filteredEntries = txFilter === "all" ? entries : entries.filter(e => e.type === txFilter);
   const byDate: Record<string, Entry[]> = {};
