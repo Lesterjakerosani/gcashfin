@@ -3,7 +3,10 @@ import { useState } from "react";
 import { X, Smartphone, Download } from "lucide-react";
 
 export function AppDownloadBanner() {
+  const isInApp = typeof navigator !== "undefined" && navigator.userAgent.includes("GCashFinApp");
   const [visible, setVisible] = useState(true);
+
+  if (isInApp) return null;
 
   function dismiss() {
     setVisible(false);
