@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+import { AppDownloadBanner } from "@/components/ui/AppDownloadBanner";
 
 const dmMono = DM_Mono({ weight: ["300", "400", "500"], subsets: ["latin"], variable: "--font-mono" });
 
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         }} />
       </head>
       <body className={`${dmMono.variable} bg-slate-200 dark:bg-[#18191A] text-gray-900 dark:text-[#E4E6EB] antialiased`}>
+        <AppDownloadBanner />
         <Providers>{children}</Providers>
       </body>
     </html>
