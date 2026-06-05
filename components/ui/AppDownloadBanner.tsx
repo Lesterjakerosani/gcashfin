@@ -1,20 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { X, Smartphone, Download } from "lucide-react";
 
-const DISMISSED_KEY = "gcashfin-apk-banner-dismissed";
-
 export function AppDownloadBanner() {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    try {
-      if (!localStorage.getItem(DISMISSED_KEY)) setVisible(true);
-    } catch {}
-  }, []);
+  const [visible, setVisible] = useState(true);
 
   function dismiss() {
-    try { localStorage.setItem(DISMISSED_KEY, "1"); } catch {}
     setVisible(false);
   }
 
